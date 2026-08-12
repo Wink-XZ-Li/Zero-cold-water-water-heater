@@ -1,0 +1,47 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 28rpx 32rpx;
+  background: var(--index-card-bg);
+  border-radius: 24rpx;
+  border: 1rpx solid var(--index-border);
+  box-sizing: border-box;
+}
+
+.title {
+  font-size: 26rpx;
+  color: var(--index-text-secondary);
+  margin-bottom: 20rpx;
+}
+
+.grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 16rpx 24rpx;
+  margin-right: 16rpx;
+  margin-bottom: 16rpx;
+  border-radius: 999rpx;
+  background: var(--index-accent-soft);
+}
+
+.chipActive {
+  background: var(--index-accent);
+}
+
+.chipDisabled {
+  opacity: 0.45;
+}
+
+.chipText {
+  font-size: 26rpx;
+  color: var(--index-accent);
+}
+
+.chipTextActive {
+  color: #ffffff;
+}

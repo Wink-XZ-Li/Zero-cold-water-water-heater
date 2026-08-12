@@ -2,3 +2,6 @@
 node_modules
 .ray
 dist
+
+.env*
+*.log

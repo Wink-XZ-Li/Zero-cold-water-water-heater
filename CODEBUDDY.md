@@ -1,12 +1,9 @@
 <!-- SPECKIT START -->
-技术栈、目录结构与实现约束以当前计划为准：
-[specs/001-st1-home-core/plan.md](./specs/001-st1-home-core/plan.md)
+当前功能：`001-st1-home-core`（首页核心已实现，见 tasks 勾选）
 
-相关产物：
-- [spec.md](./specs/001-st1-home-core/spec.md)
-- [research.md](./specs/001-st1-home-core/research.md)
-- [data-model.md](./specs/001-st1-home-core/data-model.md)
-- [quickstart.md](./specs/001-st1-home-core/quickstart.md)
+- 计划：[specs/001-st1-home-core/plan.md](./specs/001-st1-home-core/plan.md)
+- 任务：[specs/001-st1-home-core/tasks.md](./specs/001-st1-home-core/tasks.md)
+- 宪章：`.specify/memory/constitution.md`
 
-项目最高行为准则：`.specify/memory/constitution.md`
+已知缺口：Figma 像素对齐待设计 MCP 工具可用后补齐（`docs/design/ui-diff.md`）。
 <!-- SPECKIT END -->

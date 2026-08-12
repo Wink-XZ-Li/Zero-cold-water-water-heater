@@ -1,0 +1,84 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 32rpx;
+  background: var(--index-card-bg);
+  border-radius: 24rpx;
+  border: 1rpx solid var(--index-border);
+  box-sizing: border-box;
+}
+
+.currentBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 28rpx;
+}
+
+.label {
+  font-size: 26rpx;
+  color: var(--index-text-secondary);
+}
+
+.currentValue {
+  margin-top: 12rpx;
+  font-size: 72rpx;
+  font-weight: 600;
+  color: var(--index-title-color);
+  line-height: 1.1;
+}
+
+.unit {
+  font-size: 28rpx;
+  margin-left: 8rpx;
+  color: var(--index-text-secondary);
+}
+
+.setBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stepper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 16rpx;
+}
+
+.btn {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 36rpx;
+  background: var(--index-accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnDisabled {
+  opacity: 0.4;
+}
+
+.btnText {
+  font-size: 40rpx;
+  color: var(--index-accent);
+  line-height: 1;
+}
+
+.setValue {
+  min-width: 180rpx;
+  text-align: center;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--index-title-color);
+  margin: 0 24rpx;
+}
+
+.hint {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  color: var(--index-text-secondary);
+}

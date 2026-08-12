@@ -6,4 +6,9 @@ export const routes: Routes = [
     path: '/pages/home/index',
     name: 'Home',
   },
+  {
+    route: '/zero-cold-placeholder',
+    path: '/pages/zero-cold-placeholder/index',
+    name: 'ZeroColdPlaceholder',
+  },
 ];

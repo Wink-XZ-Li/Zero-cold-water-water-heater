@@ -1,31 +1,38 @@
 import React from 'react';
-import { Text, View } from '@ray-js/ray';
-import { NavBar, Button, Icon } from '@ray-js/smart-ui';
-// import { useActions } from '@ray-js/panel-sdk';
-import sunIcon from '@tuya-miniapp/icons/dist/svg/Sun';
+import { ScrollView, View } from '@ray-js/ray';
+import { NavBar } from '@ray-js/smart-ui';
+import Strings from '@/i18n';
+import { PowerSwitch } from '@/components/power-switch';
+import { ModeSelector } from '@/components/mode-selector';
+import { TempControl } from '@/components/temp-control';
+import { WorkStateDisplay } from '@/components/work-state-display';
+import { FaultBanner } from '@/components/fault-banner';
+import { ZeroColdEntry } from '@/components/zero-cold-entry';
+import { useDeviceOnlineGuard } from '@/hooks/useDeviceOnlineGuard';
 import styles from './index.module.less';
 
+/**
+ * Home layout tokens: see docs/design/home-tokens.md (Figma pending).
+ * Flame/flow intentionally not mounted until Figma confirms nodes.
+ */
 export function Home() {
-  // const actions = useActions();
+  const { online } = useDeviceOnlineGuard();
+  const disabled = !online;
 
   return (
-    <>
-      <NavBar leftText="Home" leftTextType="home" />
-      <View className={styles.view}>
-        <View
-          className={styles.content}
-          onClick={() => {
-            // actions.switch_1.toggle();
-          }}
-        >
-          <View className={styles['space-around']} style={{ marginTop: '50rpx' }}>
-            <Text>Public SDM Template</Text>
-            <Button type="primary">Smart UI Primary Button</Button>
-            <Icon name={sunIcon} size={24} />
-          </View>
+    <View className={styles.page}>
+      <NavBar title={Strings.getLang('home_title')} leftTextType="home" />
+      <ScrollView scrollY className={styles.scroll}>
+        <View className={styles.content}>
+          <FaultBanner />
+          <TempControl disabled={disabled} />
+          <PowerSwitch disabled={disabled} />
+          <ModeSelector disabled={disabled} />
+          <WorkStateDisplay />
+          <ZeroColdEntry />
         </View>
-      </View>
-    </>
+      </ScrollView>
+    </View>
   );
 }
 

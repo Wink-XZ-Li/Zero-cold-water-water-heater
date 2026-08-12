@@ -70,3 +70,8 @@
 **Decision**: IDE 虚拟设备覆盖主控 DP；视觉以 Figma 截图 + 用户 IDE 截图对照；`yarn lint` + `ray build` 作为合并前门禁。
 
 **Rationale**: 涂鸦 IDE WebView 不可用浏览器 CDP 自动化（Skill 说明）。
+
+
+## 附录：Figma 拉取（实现阶段）
+
+见 `docs/design/figma-nodes.md`。鉴权成功但设计读取工具未就绪；首页以主题变量落地，视觉对齐挂起。

@@ -2,6 +2,7 @@
 import React from 'react';
 import '@/i18n';
 import './app.less';
+import './styles/index.less';
 import { SdmProvider } from '@ray-js/panel-sdk';
 import { initPanelEnvironment } from '@ray-js/ray';
 import RayErrorCatch from '@ray-js/ray-error-catch';
