@@ -1,16 +1,12 @@
 <!--
 Sync Impact Report
 ==================
-Version change: softener 1.1.0 → ST1 Pro 1.0.0 (fork retarget)
+Version change: 1.0.0 → 1.1.0 (MINOR: Git 提交规范)
 Forked from: Water-Softener-Speckit-dev3 `.specify/memory/constitution.md` @ 1.1.0
-Modified principles:
-  - Product retarget: 软水机 → 国内伊莱克斯零冷水燃气热水器 ST1 Pro 面板小程序
-  - II. Ardot UI 设计驱动 → II. Figma UI 设计驱动 (design authority: Figma MCP, not Ardot)
-  - III. Skill-first local references: gas/boiler/water-heater repos; Softener only as Speckit process reference
-  - VI. DP safety: zero-cold / gas water heater DPs (temp_set, fault, once_zero_cold, zc_always_on, turbo, flame/flow) — remove softener regeneration/salt language
-  - Workflow: Figma → design tokens → Skill → implement → screenshot compare (Figma + IDE screenshots)
-Added/kept: Core Principles I, III, IV, V, Governance, Technology Stack (retargeted)
-Removed: Ardot MCP tooling requirements; softener regener/salt/hardness DP language
+Prior retarget (1.0.0): softener → ST1 Pro; Ardot → Figma; zero-cold DP safety
+Modified this release:
+  - Development Workflow: 新增「Git 提交规范」— commit message 主题与正文 MUST 使用中文
+  - 质量关卡: 增加中文提交合规检查
 Templates requiring updates:
   ✅ .specify/templates/plan-template.md — Constitution Check still maps to principles I–VI
   ✅ .specify/templates/spec-template.md — No structural changes
@@ -248,6 +244,22 @@ ray build --target tuya         # 生产构建
 npx eslint src --ext .js,.jsx,.ts,.tsx --fix  # 代码检查
 ```
 
+### Git 提交规范 — 不可妥协
+
+所有 git commit 信息 MUST 使用中文，便于团队审阅与 Speckit 阶段追溯。
+
+规则：
+
+- **主题（subject）与正文（body）MUST 使用中文**描述变更意图与原因。
+- **类型前缀**可保留 Conventional Commits 英文 type（如 `feat` / `fix` / `docs` / `chore`），
+  以满足本仓库 `@commitlint/config-conventional`；前缀之后的说明 MUST 为中文。
+  示例：`docs: 批准宪章并规定提交信息使用中文`。
+- MUST NOT 使用纯英文 commit message（专有名词、DP code、包名、fileKey 等标识符可保留原文）。
+- Speckit 各阶段自动/手动提交同样 MUST 遵守本条。
+
+**理由**: 本项目协作与评审以中文进行；中文提交信息降低上下文切换成本，并与 Grill / Speckit
+文档语言一致。
+
 ### 质量关卡
 
 - 所有 UI 元素 MUST 可通过 Figma 设计稿溯源。
@@ -257,6 +269,7 @@ npx eslint src --ext .js,.jsx,.ts,.tsx --fix  # 代码检查
 - ESLint MUST 零错误。
 - DP Schema MUST 与产品描述文件 / Pro_Key schema 一致。
 - 所有 DP 写入 MUST 通过范围/有效性校验。
+- 所有 git commit MUST 使用中文主题/正文（见「Git 提交规范」）。
 
 ---
 
@@ -282,4 +295,4 @@ npx eslint src --ext .js,.jsx,.ts,.tsx --fix  # 代码检查
 - 任何原则偏离 MUST 在 Complexity Tracking 表格中记录并说明理由。
 - AI 在执行任务时 MUST 以本 Constitution 作为最高优先级的行为准则（高于通用 AI 行为偏好）。
 
-**Version**: 1.0.0 | **Ratified**: 2026-08-12 | **Last Amended**: 2026-08-12
+**Version**: 1.1.0 | **Ratified**: 2026-08-12 | **Last Amended**: 2026-08-12
