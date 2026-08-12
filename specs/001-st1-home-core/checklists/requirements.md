@@ -1,35 +1,35 @@
-# Specification Quality Checklist: ST1 Pro 首页核心能力
+# 规格质量清单：ST1 Pro 首页核心能力
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning  
-**Created**: 2026-08-12  
-**Feature**: [spec.md](../spec.md)
+**目的**：在进入技术方案规划前，校验规格是否完整、质量是否达标  
+**创建日期**：2026-08-12  
+**功能**：[spec.md](../spec.md)
 
-## Content Quality
+## 内容质量
 
-- [x] No implementation details (languages, frameworks, APIs)
-- [x] Focused on user value and business needs
-- [x] Written for non-technical stakeholders
-- [x] All mandatory sections completed
+- [x] 无实现细节（语言、框架、API）
+- [x] 聚焦用户价值与业务需求
+- [x] 面向非技术干系人可读
+- [x] 所有必填章节已完成
 
-## Requirement Completeness
+## 需求完整性
 
-- [x] No [NEEDS CLARIFICATION] markers remain
-- [x] Requirements are testable and unambiguous
-- [x] Success criteria are measurable
-- [x] Success criteria are technology-agnostic (no implementation details)
-- [x] All acceptance scenarios are defined
-- [x] Edge cases are identified
-- [x] Scope is clearly bounded
-- [x] Dependencies and assumptions identified
+- [x] 无残留的 [NEEDS CLARIFICATION] 标记
+- [x] 需求可测试且表述无歧义
+- [x] 成功标准可度量
+- [x] 成功标准与技术无关（不含实现细节）
+- [x] 已定义全部验收场景
+- [x] 已识别边界情况
+- [x] 范围边界清晰
+- [x] 已识别依赖与假设
 
-## Feature Readiness
+## 功能就绪度
 
-- [x] All functional requirements have clear acceptance criteria
-- [x] User scenarios cover primary flows
-- [x] Feature meets measurable outcomes defined in Success Criteria
-- [x] No implementation details leak into specification
+- [x] 所有功能需求均有清晰验收标准
+- [x] 用户场景覆盖主路径
+- [x] 功能满足成功标准中的可度量结果
+- [x] 规格中未泄漏实现细节
 
-## Notes
+## 备注
 
-- Validation pass (2026-08-12): Spec encodes Grill decisions (001 scope, DP最小完备集, 零冷水入口→占位页, 002–004 roadmap). DP codes appear as product capability identifiers (domain language), not UI framework details.
-- Ready for `/speckit.clarify` (optional) or `/speckit.plan`.
+- 校验通过（2026-08-12）：规格已固化 Grill 共识（001 范围、DP 最小完备集、零冷水入口→占位页、002–004 路线图）。规格中的 DP 标识作为产品能力域语言出现，并非 UI 框架实现细节。
+- 可进入 `/speckit.clarify`（可选）或 `/speckit.plan`。
