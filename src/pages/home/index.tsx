@@ -22,7 +22,13 @@ export function Home() {
   return (
     <View className={styles.page}>
       <NavBar title={Strings.getLang('home_title')} leftTextType="home" />
-      <ScrollView scrollY className={styles.scroll}>
+      <ScrollView
+        scrollY
+        enhanced
+        showScrollbar={false}
+        className={styles.scroll}
+        style={{ flex: 1, height: '100%' }}
+      >
         <View className={styles.content}>
           <StatusHero />
           <FaultBanner />
