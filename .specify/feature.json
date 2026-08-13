@@ -1,1 +1,3 @@
-{ "feature_directory": "specs/001-st1-home-core" }
+{
+  "feature_directory": "specs/002-zero-cold-schedule"
+}

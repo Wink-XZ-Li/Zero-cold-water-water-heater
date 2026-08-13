@@ -1,9 +1,10 @@
 <!-- SPECKIT START -->
-当前功能：`001-st1-home-core`（首页核心已实现，见 tasks 勾选）
+当前功能：`002-zero-cold-schedule`（零冷水定时 / 设置定时）
 
-- 计划：[specs/001-st1-home-core/plan.md](./specs/001-st1-home-core/plan.md)
-- 任务：[specs/001-st1-home-core/tasks.md](./specs/001-st1-home-core/tasks.md)
+- 规格：[specs/002-zero-cold-schedule/spec.md](./specs/002-zero-cold-schedule/spec.md)
+- 计划：[specs/002-zero-cold-schedule/plan.md](./specs/002-zero-cold-schedule/plan.md)
+- 任务：待 `/speckit.tasks`
 - 宪章：`.specify/memory/constitution.md`
 
-已知缺口：Figma 像素对齐待设计 MCP 工具可用后补齐（`docs/design/ui-diff.md`）。
+上一功能 `001-st1-home-core` 已合入本分支基线；定时交互参考米家截图，视觉用 001 主题变量。
 <!-- SPECKIT END -->
