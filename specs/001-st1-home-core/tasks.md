@@ -21,7 +21,7 @@
 **Purpose**: 产品资料入库、Figma 门禁与目录骨架，不绑定业务交互
 
 - [x] T001 将产品描述文件拷贝为 `docs/product/Debugfile_ST1_Pro.json`（源：Downloads 中 ST1 Pro 20260812 Debugfile），并在 `docs/product/README.md` 注明 Pro_Key `a3cbezgki7lkl8rr`
-- [x] T002 [P] 完成 Figma MCP 鉴权（`mcp_auth`），确认可访问 fileKey `vkmMZjILzrheBxPiXO8kF4`；记录首页相关 node（入口 `55:241` 及下钻首页帧）到 `specs/001-st1-home-core/research.md` 附录或 `docs/design/figma-nodes.md`
+- [x] T002 [P] 通过 Ardot MCP 访问设计稿（原 Figma fileKey `vkmMZjILzrheBxPiXO8kF4` / Ardot `714289030938546`）；首页 node 记录于 `docs/design/figma-nodes.md`
 - [x] T003 [P] 创建组件/页面目录骨架：`src/components/{power-switch,mode-selector,temp-control,work-state-display,fault-banner,flame-flow-status,zero-cold-entry}/` 与 `src/pages/zero-cold-placeholder/`（可先放空 `index.tsx` + `index.module.less` 占位）
 - [x] T004 [P] 更新 `project.tuya.json` 展示名称为伊莱克斯 ST1 Pro / 零冷水热水器相关命名（保持 `type: panel-app` 与依赖硬约束不变）
 
@@ -55,7 +55,7 @@
 
 ### Implementation for User Story 1
 
-- [x] T012 [US1] 用 Figma `get_design_context`/`get_screenshot` 提取首页主控区 token，写入 `src/pages/home/` 样式注释或 `docs/design/home-tokens.md`
+- [x] T012 [US1] 用 Ardot `batch_read`/`capture_screenshot` 提取首页主控区 token，写入 `docs/design/home-tokens.md`
 - [x] T013 [P] [US1] 实现电源开关组件 `src/components/power-switch/index.tsx` + `index.module.less`（合约：`switch` 读写，见 `contracts/ui-dp-bindings.md`）
 - [x] T014 [P] [US1] 实现模式选择 `src/components/mode-selector/index.tsx` + `index.module.less`（`mode` enum 五档 + i18n）
 - [x] T015 [P] [US1] 实现温度控件 `src/components/temp-control/index.tsx` + `index.module.less`（`temp_set` 夹紧 35–65；展示 `temp_current` 只读）
@@ -91,7 +91,7 @@
 
 ### Implementation for User Story 3
 
-- [x] T022 [P] [US3] 实现零冷水入口 `src/components/zero-cold-entry/index.tsx` + `index.module.less`（只读 `once_zero_cold`/`zc_always_on` 摘要；点击 `navigateTo` 占位页；禁止写 DP）
+- [x] T022 [P] [US3] 实现零冷水入口 `src/components/zero-cold-entry/index.tsx` + `index.module.less`（`once_zero_cold` 开关；预热入口 `navigateTo` 占位页；完整定时属 002）
 - [x] T023 [P] [US3] 实现占位页 `src/pages/zero-cold-placeholder/index.tsx` + `index.module.less`（NavBar 返回；后续开放文案走 i18n；无定时 UI）
 - [x] T024 [US3] 将 ZeroColdEntry 接入 `src/pages/home/index.tsx`；验证返回栈（优先 `navigateBack`）
 
@@ -119,7 +119,7 @@
 - [x] T027 [P] 运行 `yarn lint`，修复 `src/` 下新增/修改文件问题
 - [x] T028 [P] 运行 `yarn build`（`ray build --target tuya`），确保构建通过
 - [x] T029 按 `quickstart.md` 做虚拟设备联调：SC-001–SC-004；记录结果到 `specs/001-st1-home-core/checklists/manual-qa.md`（中文）
-- [x] T030 对照 Figma 首页关键区块完成视觉检查（SC-005）；差异项列入 `docs/design/ui-diff.md` 或清零
+- [x] T030 对照 Ardot「方案修改」首页关键区块完成视觉检查（SC-005）；差异项列入 `docs/design/ui-diff.md`
 - [x] T031 更新 `CODEBUDDY.md` / README 短述（若需要）指向 `tasks.md` 完成状态；中文 commit 本阶段变更
 
 ---

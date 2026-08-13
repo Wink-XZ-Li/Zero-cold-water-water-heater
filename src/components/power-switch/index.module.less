@@ -2,28 +2,41 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
   width: 100%;
-  padding: 28rpx 32rpx;
+  height: 128rpx;
+  padding: 0 32rpx;
   background: var(--index-card-bg);
-  border-radius: 24rpx;
-  border: 1rpx solid var(--index-border);
+  border-radius: var(--index-card-radius);
   box-sizing: border-box;
 }
 
-.meta {
+.on {
+  /* visual affinity with powered-on; icon stays navy per design */
+}
+
+.disabled {
+  opacity: 0.45;
+}
+
+.iconWrap {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 32rpx;
+  background: var(--index-accent);
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+}
+
+.icon {
+  font-size: 36rpx;
+  color: #f5f5f5;
+  line-height: 1;
 }
 
 .label {
-  font-size: 26rpx;
-  color: var(--index-text-secondary);
-}
-
-.value {
-  margin-top: 8rpx;
-  font-size: 32rpx;
+  font-size: 36rpx;
   color: var(--index-title-color);
-  font-weight: 600;
+  line-height: 64rpx;
 }

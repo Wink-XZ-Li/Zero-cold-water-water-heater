@@ -1,16 +1,32 @@
-# Figma 节点记录
+# 设计节点记录（Ardot）
 
-**fileKey**: `vkmMZjILzrheBxPiXO8kF4`  
-**入口 URL node**: `55:241`（URL `node-id=55-241`）  
-**设计文件**: 国内伊莱克斯零冷水燃气热水器APP-UI方案
+**文件**: 国内伊莱克斯零冷水燃气热水器APP UI方案  
+**fileId**: `714289030938546`（原 Figma fileKey `vkmMZjILzrheBxPiXO8kF4`）  
+**页面**: `55:241` 方案修改  
+**工具**: Ardot MCP（`user-ardot`）
 
-## 鉴权与拉取状态（2026-08-12）
+## 首页相关帧
 
-- 已执行 Figma MCP `mcp_auth`，鉴权成功。
-- 本实现会话中 `get_design_context` / `get_metadata` / `get_screenshot` 工具未就绪（服务器仅暴露 `mcp_auth`），**未能下钻首页帧 token**。
-- 首页样式暂用项目主题 CSS 变量（`src/styles/index.less` / `src/variables.less`）落地可运行 UI；像素级对齐待工具可用后补做（见 `docs/design/ui-diff.md`、`home-tokens.md`）。
+| Frame | ID | 用途 |
+|------|-----|------|
+| iPhone 13 mini 142 | `55:788` | 首页主控（无故障）— 实现主参考 |
+| iPhone 13 mini 140 | `55:711` | 首页 + 故障提醒 |
+| iPhone 13 mini 138 / 139 | `55:864` / `55:954` | 展开瀑布浴/能耗入口 — **首包不实现**（T026） |
+| iPhone 13 mini 141 | `55:1044` | 能耗报告 — **首包不实现**（004） |
+
+## 关键区块节点
+
+| 区块 | Node | 组件 |
+|------|------|------|
+| 温度英雄卡 | `55:848` | `status-hero` |
+| 故障横幅 | `55:781` | `fault-banner` |
+| 开机 | `55:792` | `power-switch` |
+| 使用模式 | `55:797–816` | `mode-selector` |
+| 卫浴温度 | `55:832` | `temp-control` |
+| 零冷水开关 | `55:817` | `zero-cold-entry` toggle |
+| 零冷水预热 | `55:824` | `zero-cold-entry` navigate |
 
 ## 火焰 / 水流
 
-- 组件已实现：`src/components/flame-flow-status/`
-- **首页暂不挂载**：待 Figma 确认首页存在对应节点后再接入（符合 FR-007）。
+- 上述首页帧 **无** 独立火焰/水流展示节点
+- `flame-flow-status` 组件保留，首页 **不挂载**（符合 FR-007）

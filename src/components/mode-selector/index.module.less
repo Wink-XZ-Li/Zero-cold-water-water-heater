@@ -2,31 +2,47 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 28rpx 32rpx;
-  background: var(--index-card-bg);
-  border-radius: 24rpx;
-  border: 1rpx solid var(--index-border);
+  box-sizing: border-box;
+}
+
+.titleRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.titleGlyph {
+  width: 28rpx;
+  height: 28rpx;
+  margin-right: 12rpx;
+  border-radius: 14rpx;
+  border: 4rpx solid var(--index-accent);
   box-sizing: border-box;
 }
 
 .title {
-  font-size: 26rpx;
-  color: var(--index-text-secondary);
-  margin-bottom: 20rpx;
+  font-size: 28rpx;
+  color: var(--index-title-color);
+  line-height: 32rpx;
 }
 
 .grid {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .chip {
-  padding: 16rpx 24rpx;
-  margin-right: 16rpx;
-  margin-bottom: 16rpx;
-  border-radius: 999rpx;
-  background: var(--index-accent-soft);
+  width: 152rpx;
+  height: 160rpx;
+  border-radius: var(--index-chip-radius);
+  background: var(--index-card-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .chipActive {
@@ -37,11 +53,38 @@
   opacity: 0.45;
 }
 
-.chipText {
-  font-size: 26rpx;
+.iconBox {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12rpx;
+  background: var(--index-accent-soft);
+}
+
+.iconBoxActive {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.icon {
+  font-size: 22rpx;
   color: var(--index-accent);
+  line-height: 1;
+}
+
+.iconActive {
+  color: #f5f5f5;
+}
+
+.chipText {
+  font-size: 20rpx;
+  color: var(--index-title-color);
+  line-height: 32rpx;
+  text-align: center;
 }
 
 .chipTextActive {
-  color: #ffffff;
+  color: #f5f5f5;
 }
