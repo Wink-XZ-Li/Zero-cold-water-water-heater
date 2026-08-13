@@ -1,24 +1,24 @@
 # Handoff: 004 能耗报告曲线
 
 **Date**: 2026-08-13  
-**Branch**: `004-energy-charts`（从 `003-pro-settings` @ `cff66d9`）  
+**Branch**: `004-energy-charts`  
 **Spec**: `specs/004-energy-charts/spec.md`
 
 ## 已完成
 
-- 001 首页、002 定时（手测通过）、003 瀑布浴 + 报告页壳（已提交，IDE 手测可补）
-- 004 分支已创建；Draft 规格与 checklist 已写
+- FR-008 确认：**方案 A**（涂鸦统计 API + `@ray-js/stat-charts`）
+- `/speckit.plan` → research / data-model / contracts / plan / quickstart
+- `/speckit.tasks` → `tasks.md`（T001–T022）
+- `/speckit.implement`：报告页接通 StatCharts；用水/用气、日周月年、日期导航；去掉误导横幅
+- lint + build 通过；IDE 手测见 `checklists/manual-qa.md`
 
-## 待新会话做的事
+## 设计
 
-1. 确认 **FR-008** 数据源：
-   - **A**：涂鸦设备统计/日志类 API + Charts（推荐，对齐日周月年）
-   - **B**：仅累计 DP `water_total` / `gas_consumption`（无法做真日曲线，只能简化）
-2. `/speckit.plan` → `/speckit.tasks` → `/speckit.implement`
-3. 设计对照：Ardot file `714289030938546` 节点 `55:1044`
+- Ardot `714289030938546` / `55:1044`
+- 截图：`.tmp/ardot-screenshots/004/`
+- Diff：`docs/design/energy-charts-ui-diff.md`
 
-## 参考代码
+## 待用户
 
-- 本仓壳页：`src/pages/energy-report/`
-- 品类参考：`/Users/fgt/Documents/GitHub/Gas-Boiler-codybuddy/src/pages/curve/`
-- Skill：`tuya-ray-panel-dev`（Charts）
+1. 涂鸦 IDE 按 `quickstart.md` / `manual-qa.md` 手测统计数据
+2. 需要时中文 commit（本会话未自动提交）

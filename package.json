@@ -16,8 +16,10 @@
     "@ray-js/ray": "^1.7.55",
     "@ray-js/ray-error-catch": "^0.0.26",
     "@ray-js/smart-ui": "^2.7.2",
+    "@ray-js/stat-charts": "^2.2.0",
     "@reduxjs/toolkit": "^1.9.3",
     "clsx": "^1.2.1",
+    "dayjs": "^1.11.21",
     "react-redux": "^7.2.1",
     "redux-logger": "^3.0.6"
   },

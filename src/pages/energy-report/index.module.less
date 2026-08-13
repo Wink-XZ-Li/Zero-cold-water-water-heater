@@ -25,18 +25,6 @@
   box-sizing: border-box;
 }
 
-.banner {
-  padding: 20rpx 28rpx;
-  border-radius: 24rpx;
-  background: var(--index-accent-soft);
-}
-
-.bannerText {
-  font-size: 24rpx;
-  color: var(--index-accent);
-  line-height: 1.45;
-}
-
 .card {
   display: flex;
   flex-direction: column;
@@ -108,41 +96,53 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 24rpx;
-  margin-bottom: 24rpx;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
 }
 
-.dateNav {
-  font-size: 32rpx;
+.arrowBtn {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrowText {
+  font-size: 56rpx;
+  line-height: 48rpx;
   color: var(--index-accent-muted);
-  padding: 8rpx 16rpx;
 }
 
 .dateLabel {
   font-size: 28rpx;
+  font-weight: 600;
   color: var(--index-title-color);
+  min-width: 240rpx;
+  text-align: center;
 }
 
-.chartCard {
-  display: flex;
-  flex-direction: column;
-  min-height: 360rpx;
-  padding: 24rpx;
-  border-radius: 32rpx;
-  background: var(--index-accent-soft);
-  box-sizing: border-box;
+.usageText {
+  font-size: 24rpx;
+  color: var(--index-accent-muted);
+  text-align: center;
+  padding: 12rpx 0 8rpx;
 }
 
-.chartTitle {
-  font-size: 26rpx;
+.usageValue {
+  font-weight: 700;
   color: var(--index-title-color);
-  margin-bottom: 16rpx;
+  padding: 0 4px;
+}
+
+.chartBody {
+  width: 100%;
+  min-height: 480rpx;
 }
 
 .chartEmpty {
   flex: 1;
-  min-height: 280rpx;
+  min-height: 400rpx;
   border-radius: 24rpx;
   background: repeating-linear-gradient(
     to bottom,

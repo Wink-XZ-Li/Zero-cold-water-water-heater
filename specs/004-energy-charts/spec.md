@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-13
 
-**Status**: Draft
+**Status**: Implemented (IDE hand-test pending)
 
 **Input**: 路线图 004「用水/用气曲线统计」+ Ardot `55:1044` + 003 已交付的能耗报告页面壳（`src/pages/energy-report`）。
 
@@ -78,7 +78,7 @@
 - **FR-005**: 必须对照 Ardot `55:1044` 保持信息结构（切换位、周期、日期、图表区、误差说明）
 - **FR-006**: 必须复用 001 视觉 token；禁止引入米家或其他品牌色
 - **FR-007**: 本 feature MUST NOT 改写 002 定时或 003 瀑布浴主路径（可改报告页内部实现）
-- **FR-008**: 统计数据来源以 [NEEDS CLARIFICATION: 时间序列用涂鸦设备统计/日志 API，还是仅用累计 DP `water_total`/`gas_consumption` 做简化展示？] 的结论为准；禁止伪造随机曲线冒充真实用量
+- **FR-008**: 统计数据来源 MUST 为涂鸦设备统计 API（`getStatisticsRangHour` / `getStatisticsRangDay` / `getStatisticsRangMonth`，按日/周/月/年映射）+ Charts 可视化（方案 A）；MUST NOT 仅用累计 DP `water_total`/`gas_consumption` 冒充日曲线；禁止伪造随机曲线冒充真实用量
 - **FR-009**: Charts 组件选型遵循涂鸦 Skill（优先 SmartUI/Charts 或品类面板既有曲线实现）
 
 ### Key Entities
@@ -103,6 +103,7 @@
 - 默认 metric=water、period=day；切换 metric 时保持当前 period（除非数据接口限制）
 - 离线时：展示失败提示并允许返回（不强制缓存历史）
 - 视觉权威：Ardot `55:1044`；工具例外同 001–003（Ardot）
+- **FR-008 已确认（方案 A）**：时间序列用涂鸦设备统计 API + Charts；累计 DP 不作曲线数据源
 
 ## Out of Scope
 
