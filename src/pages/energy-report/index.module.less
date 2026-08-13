@@ -1,0 +1,173 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--index-main-bg);
+  box-sizing: border-box;
+}
+
+.scroll {
+  flex: 1;
+  width: 100%;
+  height: 0;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  width: 100%;
+  padding: 32rpx 32rpx 120rpx;
+  box-sizing: border-box;
+}
+
+.banner {
+  padding: 20rpx 28rpx;
+  border-radius: 24rpx;
+  background: var(--index-accent-soft);
+}
+
+.bannerText {
+  font-size: 24rpx;
+  color: var(--index-accent);
+  line-height: 1.45;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 28rpx;
+  background: var(--index-card-bg);
+  border-radius: var(--index-card-radius);
+  box-sizing: border-box;
+}
+
+.metricRow {
+  display: flex;
+  flex-direction: row;
+  align-self: flex-end;
+  padding: 6rpx;
+  border-radius: 40rpx;
+  background: var(--index-accent-soft);
+  margin-bottom: 24rpx;
+}
+
+.metricChip {
+  padding: 12rpx 28rpx;
+  border-radius: 32rpx;
+}
+
+.metricChipOn {
+  background: var(--index-accent);
+}
+
+.metricText {
+  font-size: 24rpx;
+  color: var(--index-title-color);
+}
+
+.metricTextOn {
+  color: #ffffff;
+}
+
+.periodRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.periodChip {
+  flex: 1;
+  margin: 0 6rpx;
+  padding: 16rpx 0;
+  border-radius: 24rpx;
+  background: var(--index-accent-soft);
+  text-align: center;
+}
+
+.periodChipOn {
+  background: var(--index-accent);
+}
+
+.periodText {
+  font-size: 26rpx;
+  color: var(--index-title-color);
+}
+
+.periodTextOn {
+  color: #ffffff;
+}
+
+.dateRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.dateNav {
+  font-size: 32rpx;
+  color: var(--index-accent-muted);
+  padding: 8rpx 16rpx;
+}
+
+.dateLabel {
+  font-size: 28rpx;
+  color: var(--index-title-color);
+}
+
+.chartCard {
+  display: flex;
+  flex-direction: column;
+  min-height: 360rpx;
+  padding: 24rpx;
+  border-radius: 32rpx;
+  background: var(--index-accent-soft);
+  box-sizing: border-box;
+}
+
+.chartTitle {
+  font-size: 26rpx;
+  color: var(--index-title-color);
+  margin-bottom: 16rpx;
+}
+
+.chartEmpty {
+  flex: 1;
+  min-height: 280rpx;
+  border-radius: 24rpx;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 54rpx,
+    rgba(17, 41, 89, 0.08) 54rpx,
+    rgba(17, 41, 89, 0.08) 56rpx
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chartEmptyText {
+  font-size: 24rpx;
+  color: var(--index-accent-muted);
+  padding: 0 32rpx;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.errorHint {
+  margin-top: 20rpx;
+  font-size: 22rpx;
+  color: var(--index-accent-muted);
+  line-height: 1.4;
+  text-align: center;
+}

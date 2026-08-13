@@ -16,4 +16,9 @@ export const routes: Routes = [
     path: '/pages/zero-cold-schedule-edit/index',
     name: 'ZeroColdScheduleEdit',
   },
+  {
+    route: '/energy-report',
+    path: '/pages/energy-report/index',
+    name: 'EnergyReport',
+  },
 ];
