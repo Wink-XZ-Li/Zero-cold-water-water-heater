@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView, View } from '@ray-js/ray';
-import { NavBar } from '@ray-js/smart-ui';
+import { NavBar, Dialog } from '@ray-js/smart-ui';
+import { useProps } from '@ray-js/panel-sdk';
 import Strings from '@/i18n';
 import { StatusHero } from '@/components/status-hero';
 import { PowerSwitch } from '@/components/power-switch';
@@ -16,11 +17,13 @@ import styles from './index.module.less';
 /**
  * Home layout aligned to Ardot「方案修改」55:788 / 55:711 (+ 55:864 expand rows).
  * Flame/flow not mounted — design frames have no dedicated nodes.
+ * Power-off greys write controls (grill Q6-B); preheat/energy remain enterable (Q7-A).
  */
 export function Home() {
   const { online } = useDeviceOnlineGuard();
-  // Match existing home controls: offline disables; power-off not separately gated (001/002).
-  const disabled = !online;
+  const powerOn = useProps(p => !!p.switch);
+  const offline = !online;
+  const writeDisabled = offline || !powerOn;
 
   return (
     <View className={styles.page}>
@@ -35,14 +38,15 @@ export function Home() {
         <View className={styles.content}>
           <StatusHero />
           <FaultBanner />
-          <PowerSwitch disabled={disabled} />
-          <ModeSelector disabled={disabled} />
-          <TempControl disabled={disabled} />
-          <ZeroColdEntry disabled={disabled} />
-          <WaterfallBathEntry disabled={disabled} />
+          <PowerSwitch disabled={offline} />
+          <ModeSelector disabled={writeDisabled} />
+          <TempControl disabled={writeDisabled} />
+          <ZeroColdEntry writeDisabled={writeDisabled} />
+          <WaterfallBathEntry disabled={writeDisabled} />
           <EnergyReportEntry />
         </View>
       </ScrollView>
+      <Dialog id="smart-dialog" />
     </View>
   );
 }

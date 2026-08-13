@@ -3,6 +3,7 @@ import { View, Text } from '@ray-js/ray';
 import { useProps, useActions } from '@ray-js/panel-sdk';
 import { useTempSetGuard } from '@/hooks/useTempSetGuard';
 import Strings from '@/i18n';
+import { ICON_LIGHT, MinusGlyph, PlusGlyph, ShowerGlyph } from '@/components/panel-icons';
 import styles from './index.module.less';
 
 type Props = {
@@ -27,10 +28,12 @@ export function TempControl({ disabled }: Props) {
   };
 
   return (
-    <View className={styles.wrap}>
+    <View className={`${styles.wrap} ${disabled ? styles.disabled : ''}`}>
       <View className={styles.header}>
-        <View className={styles.headerIcon}>
-          <Text className={styles.headerIconText}>浴</Text>
+        <View className={styles.notch}>
+          <View className={styles.notchInner}>
+            <ShowerGlyph fill={ICON_LIGHT} size={16} />
+          </View>
         </View>
         <Text className={styles.headerTitle}>{Strings.getLang('bath_temp_set')}</Text>
         <Text className={styles.headerValue}>
@@ -38,34 +41,36 @@ export function TempControl({ disabled }: Props) {
           {Strings.getLang('unit_celsius')}
         </Text>
       </View>
-      <View className={styles.body}>
-        <View
-          className={`${styles.btn} ${disabled ? styles.btnDisabled : ''}`}
-          onClick={() => applyDelta(-1)}
-        >
-          <Text className={styles.btnText}>−</Text>
+      <View className={styles.panel}>
+        <View className={styles.body}>
+          <View
+            className={`${styles.btn} ${disabled ? styles.btnDisabled : ''}`}
+            onClick={() => applyDelta(-1)}
+          >
+            <MinusGlyph fill={ICON_LIGHT} size={12} />
+          </View>
+          <View className={styles.slider}>
+            <View className={styles.track} />
+            <View className={styles.fill} style={{ width: `${Math.round(ratio * 100)}%` }} />
+            <View className={styles.thumb} style={{ left: `${Math.round(ratio * 100)}%` }} />
+          </View>
+          <View
+            className={`${styles.btn} ${disabled ? styles.btnDisabled : ''}`}
+            onClick={() => applyDelta(1)}
+          >
+            <PlusGlyph fill={ICON_LIGHT} size={12} />
+          </View>
         </View>
-        <View className={styles.slider}>
-          <View className={styles.track} />
-          <View className={styles.fill} style={{ width: `${Math.round(ratio * 100)}%` }} />
-          <View className={styles.thumb} style={{ left: `${Math.round(ratio * 100)}%` }} />
+        <View className={styles.rangeRow}>
+          <Text className={styles.rangeText}>
+            {min}
+            {Strings.getLang('unit_celsius')}
+          </Text>
+          <Text className={styles.rangeText}>
+            {max}
+            {Strings.getLang('unit_celsius')}
+          </Text>
         </View>
-        <View
-          className={`${styles.btn} ${disabled ? styles.btnDisabled : ''}`}
-          onClick={() => applyDelta(1)}
-        >
-          <Text className={styles.btnText}>+</Text>
-        </View>
-      </View>
-      <View className={styles.rangeRow}>
-        <Text className={styles.rangeText}>
-          {min}
-          {Strings.getLang('unit_celsius')}
-        </Text>
-        <Text className={styles.rangeText}>
-          {max}
-          {Strings.getLang('unit_celsius')}
-        </Text>
       </View>
     </View>
   );

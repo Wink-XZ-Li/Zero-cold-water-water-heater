@@ -17,11 +17,15 @@
     "@ray-js/ray-error-catch": "^0.0.26",
     "@ray-js/smart-ui": "^2.7.2",
     "@ray-js/stat-charts": "^2.2.0",
+    "@ray-js/svg": "^0.1.8",
     "@reduxjs/toolkit": "^1.9.3",
     "clsx": "^1.2.1",
     "dayjs": "^1.11.21",
     "react-redux": "^7.2.1",
-    "redux-logger": "^3.0.6"
+    "redux-logger": "^3.0.6",
+    "htm": "3.1.1",
+    "preact": "10.10.0",
+    "preact-render-to-string": "5.2.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.2.1",

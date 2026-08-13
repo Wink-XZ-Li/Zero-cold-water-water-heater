@@ -3,6 +3,7 @@ import { View, Text } from '@ray-js/ray';
 import { Switch } from '@ray-js/smart-ui';
 import { useProps, useActions } from '@ray-js/panel-sdk';
 import Strings from '@/i18n';
+import { ICON_LIGHT, WaterfallGlyph } from '@/components/panel-icons';
 import styles from './index.module.less';
 
 type Props = {
@@ -25,7 +26,7 @@ export function WaterfallBathEntry({ disabled }: Props) {
   return (
     <View className={`${styles.row} ${disabled ? styles.disabled : ''}`}>
       <View className={styles.iconWrap}>
-        <Text className={styles.icon}>瀑</Text>
+        <WaterfallGlyph fill={ICON_LIGHT} size={20} />
       </View>
       <View className={styles.textCol}>
         <Text className={styles.title}>{Strings.getLang('waterfall_bath')}</Text>

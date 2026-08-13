@@ -3,15 +3,17 @@ import { View, Text } from '@ray-js/ray';
 import { useProps, useActions } from '@ray-js/panel-sdk';
 import { isEnumAllowed } from '@/utils/dp';
 import Strings from '@/i18n';
+import { ModeIcon } from '@/components/mode-icons';
+import { ICON_NAVY, ModeTitleGlyph } from '@/components/panel-icons';
 import styles from './index.module.less';
 
 /** Design shows four tiles; no_mode remains in schema but is not a tile. */
 const MODE_TILES = [
-  { code: 'eco', mark: 'Eco' },
-  { code: 'kitchen', mark: '厨' },
-  { code: 'bath', mark: '浴' },
-  { code: 'auto_temp', mark: '温' },
-] as const;
+  { code: 'eco' as const },
+  { code: 'kitchen' as const },
+  { code: 'bath' as const },
+  { code: 'auto_temp' as const },
+];
 
 const MODE_RANGE = ['no_mode', 'eco', 'kitchen', 'bath', 'auto_temp'];
 
@@ -39,7 +41,9 @@ export function ModeSelector({ disabled }: Props) {
   return (
     <View className={styles.wrap}>
       <View className={styles.titleRow}>
-        <View className={styles.titleGlyph} />
+        <View className={styles.titleGlyph}>
+          <ModeTitleGlyph fill={ICON_NAVY} size={14} />
+        </View>
         <Text className={styles.title}>{Strings.getLang('mode')}</Text>
       </View>
       <View className={styles.grid}>
@@ -53,10 +57,8 @@ export function ModeSelector({ disabled }: Props) {
               }`}
               onClick={() => onSelect(item.code)}
             >
-              <View className={`${styles.iconBox} ${active ? styles.iconBoxActive : ''}`}>
-                <Text className={`${styles.icon} ${active ? styles.iconActive : ''}`}>
-                  {item.mark}
-                </Text>
+              <View className={styles.iconBox}>
+                <ModeIcon code={item.code} active={active} />
               </View>
               <Text className={`${styles.chipText} ${active ? styles.chipTextActive : ''}`}>
                 {modeLabel(item.code)}

@@ -2,47 +2,65 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  overflow: hidden;
   background: var(--index-card-bg);
   border-radius: 40rpx;
-  overflow: hidden;
   box-sizing: border-box;
 }
 
+.disabled {
+  opacity: 0.45;
+}
+
 .header {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
   height: 104rpx;
-  padding: 0 28rpx;
+  padding: 0 28rpx 0 108rpx;
   background: var(--index-accent);
   box-sizing: border-box;
 }
 
-.headerIcon {
-  width: 48rpx;
-  height: 48rpx;
-  border-radius: 24rpx;
-  background: rgba(255, 255, 255, 0.16);
+.notch {
+  position: absolute;
+  left: 12rpx;
+  top: 12rpx;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 40rpx;
+  background: var(--index-card-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 16rpx;
 }
 
-.headerIconText {
-  font-size: 22rpx;
-  color: #f5f5f5;
+.notchInner {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 32rpx;
+  background: var(--index-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .headerTitle {
   flex: 1;
   font-size: 28rpx;
+  font-weight: 700;
   color: #f5f5f5;
 }
 
 .headerValue {
   font-size: 28rpx;
+  font-weight: 500;
   color: #f5f5f5;
+}
+
+.panel {
+  background: var(--index-card-bg);
 }
 
 .body {
@@ -54,9 +72,9 @@
 }
 
 .btn {
-  width: 48rpx;
-  height: 48rpx;
-  border-radius: 24rpx;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 28rpx;
   background: var(--index-accent-muted);
   display: flex;
   align-items: center;
@@ -66,12 +84,6 @@
 
 .btnDisabled {
   opacity: 0.4;
-}
-
-.btnText {
-  font-size: 32rpx;
-  color: #ffffff;
-  line-height: 1;
 }
 
 .slider {
@@ -94,8 +106,8 @@
 .fill {
   position: absolute;
   left: 0;
-  top: 16rpx;
-  height: 24rpx;
+  top: 14rpx;
+  height: 28rpx;
   border-radius: 20rpx;
   background: var(--index-accent-track);
 }
@@ -114,7 +126,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding: 0 88rpx 24rpx;
+  padding: 0 80rpx 24rpx;
   box-sizing: border-box;
 }
 
