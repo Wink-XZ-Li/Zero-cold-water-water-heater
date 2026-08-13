@@ -135,14 +135,16 @@ export function ZeroColdScheduleEdit() {
 
   return (
     <View className={styles.page}>
+      {/*
+        leftArrow + onClickLeftText：纯 leftText 在部分端上点不到。
+        保存放到底部栏，避开 App 右上角「设置/关闭」悬浮控件。
+      */}
       <NavBar
         title={title}
+        leftArrow
         leftText={Strings.getLang('cancel')}
-        rightText={saving ? '...' : Strings.getLang('save')}
         onClickLeft={() => navigateBack()}
-        onClickRight={() => {
-          if (!saving && hydrated) onSave();
-        }}
+        onClickLeftText={() => navigateBack()}
       />
       <ScrollView
         scrollY
@@ -199,6 +201,17 @@ export function ZeroColdScheduleEdit() {
           </View>
         </View>
       </ScrollView>
+
+      <View className={styles.footer}>
+        <View
+          className={`${styles.saveBtn} ${saving || !hydrated ? styles.saveBtnDisabled : ''}`}
+          onClick={() => {
+            if (!saving && hydrated) onSave();
+          }}
+        >
+          <Text className={styles.saveBtnText}>{saving ? '...' : Strings.getLang('save')}</Text>
+        </View>
+      </View>
 
       <Popup show={!!picker} position="bottom" round onClose={() => setPicker(null)}>
         <View className={styles.pickerPanel}>

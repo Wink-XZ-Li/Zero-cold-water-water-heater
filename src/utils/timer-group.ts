@@ -127,3 +127,143 @@ export function toTimerGroups(timers: CloudTimer[]): TimerGroup[] {
 export function orphanTimerIds(group: TimerGroup, timers: CloudTimer[]): string[] {
   return timers.filter(t => t.aliasName === group.aliasName).map(t => t.timerId);
 }
+
+export type TimerCheckIssue = {
+  level: 'error' | 'warn' | 'info';
+  code: string;
+  message: string;
+  aliasName?: string;
+  timerId?: string;
+};
+
+export type TimerConsistencyReport = {
+  timerCount: number;
+  groupCount: number;
+  completeCount: number;
+  orphanCount: number;
+  ok: boolean;
+  issues: TimerCheckIssue[];
+  groups: TimerGroup[];
+};
+
+/**
+ * Validate raw cloud timers vs business TimerGroup pairing rules.
+ */
+export function validateTimerConsistency(timers: CloudTimer[]): TimerConsistencyReport {
+  const groups = toTimerGroups(timers);
+  const issues: TimerCheckIssue[] = [];
+
+  timers.forEach(t => {
+    if (!t.timerId) {
+      issues.push({ level: 'error', code: 'missing_timer_id', message: 'Timer 缺少 timerId' });
+    }
+    if (!t.aliasName) {
+      issues.push({
+        level: 'warn',
+        code: 'missing_alias',
+        message: 'Timer 缺少 aliasName，无法成组',
+        timerId: t.timerId,
+      });
+    }
+    if (!isValidLoops(t.loops || '')) {
+      issues.push({
+        level: 'error',
+        code: 'invalid_loops',
+        message: `loops 非法: ${t.loops}`,
+        timerId: t.timerId,
+        aliasName: t.aliasName,
+      });
+    }
+    const dps = t.dps || {};
+    const has104 = Object.prototype.hasOwnProperty.call(dps, ZC_ALWAYS_ON_DP_ID);
+    if (!has104) {
+      issues.push({
+        level: 'error',
+        code: 'missing_dp_104',
+        message: 'dps 未包含 104',
+        timerId: t.timerId,
+        aliasName: t.aliasName,
+      });
+    }
+    const extraKeys = Object.keys(dps).filter(k => k !== ZC_ALWAYS_ON_DP_ID);
+    if (extraKeys.length) {
+      issues.push({
+        level: 'warn',
+        code: 'extra_dps',
+        message: `dps 含非 104 键: ${extraKeys.join(',')}`,
+        timerId: t.timerId,
+        aliasName: t.aliasName,
+      });
+    }
+  });
+
+  groups.forEach(g => {
+    if (g.orphan) {
+      issues.push({
+        level: 'error',
+        code: 'orphan_group',
+        message: `半组/不成对: start=${g.startTimerId || '-'} end=${g.endTimerId || '-'}`,
+        aliasName: g.aliasName,
+      });
+      return;
+    }
+    if (!isValidTimeRange(g.startTime, g.endTime)) {
+      issues.push({
+        level: 'error',
+        code: 'same_time',
+        message: `开启/关闭时间相同或非法: ${g.startTime} / ${g.endTime}`,
+        aliasName: g.aliasName,
+      });
+    }
+    const pair = timers.filter(t => t.aliasName === g.aliasName);
+    if (pair.length !== 2) {
+      issues.push({
+        level: 'error',
+        code: 'pair_count',
+        message: `同 alias 条数应为 2，实际 ${pair.length}`,
+        aliasName: g.aliasName,
+      });
+    }
+    const [a, b] = pair;
+    if (a && b) {
+      if (a.loops !== b.loops) {
+        issues.push({
+          level: 'warn',
+          code: 'loops_mismatch',
+          message: `两侧 loops 不一致: ${a.loops} vs ${b.loops}`,
+          aliasName: g.aliasName,
+        });
+      }
+      if (!!a.isAppPush !== !!b.isAppPush) {
+        issues.push({
+          level: 'warn',
+          code: 'push_mismatch',
+          message: `两侧 isAppPush 不一致: ${a.isAppPush} vs ${b.isAppPush}`,
+          aliasName: g.aliasName,
+        });
+      }
+      if (!!a.status !== !!b.status) {
+        issues.push({
+          level: 'warn',
+          code: 'status_mismatch',
+          message: `两侧 status 不一致: ${a.status} vs ${b.status}（UI enabled=${g.enabled}）`,
+          aliasName: g.aliasName,
+        });
+      }
+    }
+  });
+
+  const orphanCount = groups.filter(g => g.orphan).length;
+  const completeCount = groups.length - orphanCount;
+  const hasError = issues.some(i => i.level === 'error');
+
+  return {
+    timerCount: timers.length,
+    groupCount: groups.length,
+    completeCount,
+    orphanCount,
+    ok: !hasError,
+    issues,
+    groups,
+  };
+}

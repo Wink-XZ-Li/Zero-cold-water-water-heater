@@ -14,6 +14,22 @@ type Props = {
   onCleanup?: () => void;
 };
 
+function readChecked(event: unknown): boolean {
+  if (typeof event === 'boolean') return event;
+  if (event && typeof event === 'object') {
+    const { detail } = event as { detail?: unknown };
+    if (typeof detail === 'boolean') return detail;
+    if (detail && typeof detail === 'object' && 'value' in (detail as Record<string, unknown>)) {
+      return !!(detail as { value?: boolean }).value;
+    }
+  }
+  return false;
+}
+
+/**
+ * Row text opens edit; Switch is a sibling (not child of text hit area)
+ * so Ray click bubbling cannot navigate while toggling.
+ */
 export function ScheduleGroupItem({
   group,
   toggling,
@@ -39,8 +55,8 @@ export function ScheduleGroupItem({
 
   return (
     <View className={`${styles.item} ${group.orphan ? styles.orphan : ''}`}>
-      <View className={styles.main} onClick={group.orphan ? undefined : onPress}>
-        <View className={styles.textCol}>
+      <View className={styles.main}>
+        <View className={styles.textCol} onClick={group.orphan ? undefined : onPress}>
           <Text className={styles.time}>
             {group.startTime} - {group.endTime}
           </Text>
@@ -54,20 +70,13 @@ export function ScheduleGroupItem({
           )}
         </View>
         {!group.orphan && (
-          <View
-            className={styles.switchWrap}
-            onClick={e => {
-              // prevent row navigation when flipping switch
-              e?.stopPropagation?.();
-            }}
-          >
+          <View className={styles.switchWrap}>
             <Switch
               checked={group.enabled}
               disabled={!!toggling}
               activeColor="var(--index-accent)"
-              onChange={(event: { detail?: boolean } | boolean) => {
-                const checked = typeof event === 'boolean' ? event : !!event?.detail;
-                onToggle?.(checked);
+              onChange={(event: unknown) => {
+                onToggle?.(readChecked(event));
               }}
             />
           </View>

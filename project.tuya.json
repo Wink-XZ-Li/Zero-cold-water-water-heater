@@ -12,9 +12,10 @@
     "BizKit": "3.0.1",
     "HomeKit": "3.0.2"
   },
-  "baseversion": "2.30.1",
+  "baseversion": "2.30.24",
   "devMode": "ray",
   "compileType": "miniprogram",
   "projectname": "Electrolux-ST1-Pro-Zero-Cold",
-  "description": "国内伊莱克斯零冷水燃气热水器 ST1 Pro 面板"
+  "description": "国内伊莱克斯零冷水燃气热水器 ST1 Pro 面板",
+  "remoteDebug": "lan"
 }
