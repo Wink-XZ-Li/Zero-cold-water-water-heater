@@ -1,0 +1,125 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--index-main-bg);
+  box-sizing: border-box;
+}
+
+.scroll {
+  flex: 1;
+  width: 100%;
+  height: 0;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  width: 100%;
+  padding: 32rpx 32rpx 120rpx;
+  box-sizing: border-box;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--index-card-bg);
+  border-radius: var(--index-card-radius);
+  padding: 8rpx 0;
+  box-sizing: border-box;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-height: 104rpx;
+  padding: 0 28rpx;
+  box-sizing: border-box;
+}
+
+.label {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--index-title-color);
+}
+
+.value {
+  font-size: 28rpx;
+  color: var(--index-accent-muted);
+}
+
+.hint {
+  padding: 0 28rpx 20rpx;
+  font-size: 22rpx;
+  color: var(--index-accent-muted);
+  line-height: 1.4;
+}
+
+.sectionTitle {
+  font-size: 26rpx;
+  color: var(--index-accent-muted);
+  padding: 12rpx 8rpx 0;
+}
+
+.days {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding: 20rpx 28rpx 28rpx;
+  box-sizing: border-box;
+}
+
+.day {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 36rpx;
+  background: var(--index-accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dayOn {
+  background: var(--index-accent);
+}
+
+.dayText {
+  font-size: 26rpx;
+  color: var(--index-title-color);
+}
+
+.dayTextOn {
+  color: #ffffff;
+}
+
+.pickerPanel {
+  background: #ffffff;
+}
+
+.pickerToolbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  height: 88rpx;
+  padding: 0 32rpx;
+  border-bottom: 1rpx solid #eef1f6;
+}
+
+.pickerAction {
+  font-size: 28rpx;
+  color: var(--index-accent);
+}
+
+.pickerTitle {
+  font-size: 28rpx;
+  color: var(--index-title-color);
+}

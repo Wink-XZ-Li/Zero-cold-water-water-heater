@@ -7,8 +7,13 @@ export const routes: Routes = [
     name: 'Home',
   },
   {
-    route: '/zero-cold-placeholder',
-    path: '/pages/zero-cold-placeholder/index',
-    name: 'ZeroColdPlaceholder',
+    route: '/zero-cold-schedule',
+    path: '/pages/zero-cold-schedule/index',
+    name: 'ZeroColdSchedule',
+  },
+  {
+    route: '/zero-cold-schedule-edit',
+    path: '/pages/zero-cold-schedule-edit/index',
+    name: 'ZeroColdScheduleEdit',
   },
 ];

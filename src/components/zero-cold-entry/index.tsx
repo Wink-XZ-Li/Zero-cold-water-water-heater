@@ -11,7 +11,7 @@ type Props = {
 
 /**
  * Zero-cold home block — Ardot 55:817 (toggle) + 55:824 (preheat entry).
- * Toggle binds once_zero_cold only; schedule details stay on placeholder page.
+ * Toggle binds once_zero_cold; preheat row opens schedule list (002).
  */
 export function ZeroColdEntry({ disabled }: Props) {
   const once = useProps(p => !!p.once_zero_cold);
@@ -24,7 +24,7 @@ export function ZeroColdEntry({ disabled }: Props) {
   };
 
   const onOpenPreheat = () => {
-    navigateTo({ url: '/pages/zero-cold-placeholder/index' });
+    navigateTo({ url: '/pages/zero-cold-schedule/index' });
   };
 
   return (
