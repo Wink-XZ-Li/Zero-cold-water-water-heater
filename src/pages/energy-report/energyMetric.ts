@@ -10,26 +10,33 @@ export interface EnergyMetricMeta {
   dpCode: 'water_total' | 'gas_consumption';
   dpId: number;
   unit: string;
-  titleKey: 'energy_chart_water_title' | 'energy_chart_gas_title';
-  /** gas scale=3 → 保留小数 */
+  nameKey: 'energy_metric_water' | 'energy_metric_gas';
+  /** Cloud water_total is liters; convert to m³ for display. */
+  litersToM3: boolean;
   keepScalaPoint: boolean;
 }
+
+export const DISPLAY_UNIT = 'm³';
+export const LITERS_PER_M3 = 1000;
+export const CHART_HEIGHT = 640;
 
 export const ENERGY_METRICS: Record<EnergyMetric, EnergyMetricMeta> = {
   water: {
     id: 'water',
     dpCode: 'water_total',
     dpId: 25,
-    unit: 'L',
-    titleKey: 'energy_chart_water_title',
-    keepScalaPoint: false,
+    unit: DISPLAY_UNIT,
+    nameKey: 'energy_metric_water',
+    litersToM3: true,
+    keepScalaPoint: true,
   },
   gas: {
     id: 'gas',
     dpCode: 'gas_consumption',
     dpId: 24,
-    unit: 'm³',
-    titleKey: 'energy_chart_gas_title',
+    unit: DISPLAY_UNIT,
+    nameKey: 'energy_metric_gas',
+    litersToM3: true,
     keepScalaPoint: true,
   },
 };
@@ -41,6 +48,36 @@ export const CHART_STYLE = {
   margin: '0',
   marginBottom: '-10px',
 };
+
+export function litersToCubicMeters(liters: number): number {
+  return liters / LITERS_PER_M3;
+}
+
+type ChartPoint = { value?: string | number };
+type ChartSeries = { data?: ChartPoint[] };
+
+export function mapSeriesValues(
+  originData: ChartSeries[],
+  mapFn: (n: number) => number
+): ChartSeries[] {
+  return originData.map(series => ({
+    ...series,
+    data: (series.data ?? []).map(point => {
+      const raw = parseFloat(String(point.value));
+      const next = Number.isNaN(raw) ? 0 : mapFn(raw);
+      return { ...point, value: next };
+    }),
+  }));
+}
+
+export function formatUsageM3(total: number): string {
+  return total.toFixed(3);
+}
+
+/** "用水量 1.234 m³" — name, value, unit. */
+export function formatChartTitle(name: string, amount: string, unit: string): string {
+  return `${name} ${amount} ${unit}`;
+}
 
 /** Align miniapp-1 chart-card: day→1hour, week/month→1day, year→1month */
 export function periodToChartRange(period: EnergyPeriod): ChartRange {
@@ -112,11 +149,23 @@ export function clampToRange(period: EnergyPeriod, next: Dayjs, today = dayjs())
   const max = today;
   const min = getMinDate(period, today);
   let target = next;
-  if (period === 'month') target = target.startOf('month');
-  if (period === 'year') target = target.startOf('year');
   if (target.isAfter(max)) target = max;
   if (target.isBefore(min)) target = min;
   return target;
+}
+
+/** Native month/year pickers return YYYY-MM-01 / YYYY-01-01. Keep the current day (and month for year). */
+export function overlayPickerDate(prev: Dayjs, picked: Dayjs, period: EnergyPeriod): Dayjs {
+  const keepDay = prev.date();
+  if (period === 'month') {
+    const next = prev.date(1).year(picked.year()).month(picked.month());
+    return next.date(Math.min(keepDay, next.daysInMonth()));
+  }
+  if (period === 'year') {
+    const next = prev.date(1).year(picked.year());
+    return next.date(Math.min(keepDay, next.daysInMonth()));
+  }
+  return picked;
 }
 
 export function shiftAnchor(period: EnergyPeriod, anchor: Dayjs, delta: 1 | -1): Dayjs {

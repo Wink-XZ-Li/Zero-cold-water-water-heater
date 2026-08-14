@@ -182,12 +182,12 @@ export const defaultSchema = [
     mode: 'ro',
     name: '耗气量',
     property: {
-      max: 1000000,
+      max: 1000000000,
       min: 0,
-      scale: 3,
+      scale: 0,
       step: 1,
       type: 'value',
-      unit: 'm3',
+      unit: 'L',
     },
     type: 'obj',
     subType: 'value',
@@ -207,7 +207,7 @@ export const defaultSchema = [
     name: '耗水量',
     property: {
       max: 1000000000,
-      min: 1,
+      min: 0,
       scale: 0,
       step: 1,
       type: 'value',
@@ -215,7 +215,7 @@ export const defaultSchema = [
     },
     type: 'obj',
     subType: 'value',
-    defaultValue: '1',
+    defaultValue: '0',
   },
   {
     attr: 1152,

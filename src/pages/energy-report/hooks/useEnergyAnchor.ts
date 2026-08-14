@@ -4,7 +4,9 @@ import {
   clampToRange,
   EnergyPeriod,
   formatAnchorLabel,
+  overlayPickerDate,
   formatDateToken,
+  getMinDate,
   getPeriodWindow,
   isNextDisabled,
   isPrevDisabled,
@@ -17,10 +19,15 @@ export interface EnergyAnchorState {
   anchor: Dayjs;
   period: EnergyPeriod;
   setPeriod: (period: EnergyPeriod) => void;
+  setAnchorDate: (value: string) => void;
   label: string;
   chartRange: ChartRange;
   startDate: string;
   endDate: string;
+  pickerValue: string;
+  pickerStart: string;
+  pickerEnd: string;
+  pickerFields: 'day' | 'month' | 'year';
   goPrev: () => void;
   goNext: () => void;
   canGoNext: boolean;
@@ -59,14 +66,31 @@ export function useEnergyAnchor(initialPeriod: EnergyPeriod = 'day'): EnergyAnch
     setAnchor(prev => shiftAnchor(period, prev, 1));
   }, [period, anchor]);
 
+  const setAnchorDate = useCallback(
+    (value: string) => {
+      const picked = dayjs(value);
+      if (!picked.isValid()) return;
+      setAnchor(prev => clampToRange(period, overlayPickerDate(prev, picked, period)));
+    },
+    [period]
+  );
+
+  const pickerFields: 'day' | 'month' | 'year' =
+    period === 'year' ? 'year' : period === 'month' ? 'month' : 'day';
+
   return {
     anchor,
     period,
     setPeriod,
+    setAnchorDate,
     label: formatAnchorLabel(period, anchor),
     chartRange,
     startDate: window.start.format(dateFormat),
     endDate: window.end.format(dateFormat),
+    pickerValue: anchor.format('YYYY-MM-DD'),
+    pickerStart: getMinDate(period).format('YYYY-MM-DD'),
+    pickerEnd: dayjs().format('YYYY-MM-DD'),
+    pickerFields,
     goPrev,
     goNext,
     canGoNext: !isNextDisabled(period, anchor),
