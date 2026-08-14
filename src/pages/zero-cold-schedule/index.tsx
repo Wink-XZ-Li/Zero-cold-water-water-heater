@@ -12,6 +12,7 @@ import { NavBar, Dialog, DialogInstance, Popup } from '@ray-js/smart-ui';
 import Strings from '@/i18n';
 import { ScheduleGroupItem } from '@/components/schedule-group-item';
 import { useTimerGroups } from '@/hooks/useTimerGroups';
+import { toastScheduleProgress, toastScheduleSuccess } from '@/utils/schedule-toast';
 import {
   isZcAlwaysOn,
   validateTimerConsistency,
@@ -38,12 +39,14 @@ export function ZeroColdSchedule() {
   const { timers, groups, loading, error, refresh, setGroupEnabled, removeGroup } =
     useTimerGroups();
   const [busyAlias, setBusyAlias] = useState<string | null>(null);
+  const [leavingAlias, setLeavingAlias] = useState<string | null>(null);
+  const [pulling, setPulling] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
   const [debugBusy, setDebugBusy] = useState(false);
   const [report, setReport] = useState<TimerConsistencyReport | null>(null);
 
   usePageEvent('onShow', () => {
-    refresh();
+    refresh({ silent: true });
   });
 
   const toastFail = (key: string) => {
@@ -54,7 +57,7 @@ export function ZeroColdSchedule() {
     setDebugOpen(true);
     setDebugBusy(true);
     try {
-      await refresh();
+      await refresh({ silent: true });
     } finally {
       setDebugBusy(false);
     }
@@ -63,7 +66,7 @@ export function ZeroColdSchedule() {
   const resyncDebug = useCallback(async () => {
     setDebugBusy(true);
     try {
-      await refresh();
+      await refresh({ silent: true });
     } finally {
       setDebugBusy(false);
     }
@@ -89,11 +92,15 @@ export function ZeroColdSchedule() {
   );
 
   const confirmRemove = useCallback(
-    async (group: TimerGroup) => {
+    async (group: TimerGroup, kind: 'delete' | 'cleanup' = 'delete') => {
       try {
         await DialogInstance.confirm({
-          title: Strings.getLang('schedule_delete_title'),
-          message: Strings.getLang('schedule_delete_message'),
+          title: Strings.getLang(
+            kind === 'cleanup' ? 'schedule_cleanup_title' : 'schedule_delete_title'
+          ),
+          message: Strings.getLang(
+            kind === 'cleanup' ? 'schedule_cleanup_message' : 'schedule_delete_message'
+          ),
           confirmButtonText: Strings.getLang('confirm'),
           cancelButtonText: Strings.getLang('cancel'),
         });
@@ -101,12 +108,20 @@ export function ZeroColdSchedule() {
         return;
       }
       setBusyAlias(group.aliasName);
+      setLeavingAlias(group.aliasName);
+      toastScheduleProgress('delete');
       try {
-        await removeGroup(group);
+        await Promise.all([
+          removeGroup(group),
+          new Promise<void>(resolve => setTimeout(resolve, 280)),
+        ]);
+        toastScheduleSuccess('delete');
       } catch {
+        setLeavingAlias(null);
         toastFail('schedule_delete_failed');
       } finally {
         setBusyAlias(null);
+        setLeavingAlias(current => (current === group.aliasName ? null : current));
       }
     },
     [removeGroup]
@@ -138,9 +153,10 @@ export function ZeroColdSchedule() {
         className={styles.scroll}
         style={{ flex: 1, height: '100%' }}
         refresherEnabled
-        refresherTriggered={loading}
+        refresherTriggered={pulling}
         onRefresherRefresh={() => {
-          refresh();
+          setPulling(true);
+          refresh({ silent: true }).finally(() => setPulling(false));
         }}
       >
         <View className={styles.content}>
@@ -148,25 +164,36 @@ export function ZeroColdSchedule() {
             <Text className={styles.debugEntryText}>{Strings.getLang('schedule_debug')}</Text>
           </View>
           {error && !groups.length ? (
-            <Text className={styles.empty}>{Strings.getLang('schedule_load_failed')}</Text>
+            <View className={styles.emptyWrap} onClick={() => refresh()}>
+              <Text className={styles.error}>{Strings.getLang('schedule_load_failed')}</Text>
+            </View>
           ) : null}
           {!loading && !error && groups.length === 0 ? (
-            <Text className={styles.empty}>{Strings.getLang('schedule_empty')}</Text>
+            <View className={styles.emptyWrap}>
+              <Text className={styles.empty}>{Strings.getLang('schedule_empty')}</Text>
+            </View>
           ) : null}
           {groups.map(group => (
             <ScheduleGroupItem
               key={group.aliasName}
               group={group}
               toggling={busyAlias === group.aliasName}
+              leaving={leavingAlias === group.aliasName}
               onToggle={enabled => onToggle(group, enabled)}
               onPress={() => openEdit(group)}
-              onDelete={() => confirmRemove(group)}
-              onCleanup={() => confirmRemove(group)}
+              onDelete={() => confirmRemove(group, 'delete')}
+              onCleanup={() => confirmRemove(group, 'cleanup')}
             />
           ))}
         </View>
       </ScrollView>
-      <View className={styles.fab} onClick={openCreate}>
+      <View
+        className={styles.fab}
+        hoverClassName={styles.fabHover}
+        hoverStartTime={20}
+        hoverStayTime={70}
+        onClick={openCreate}
+      >
         <Text className={styles.fabText}>+</Text>
       </View>
       <Dialog id="smart-dialog" />

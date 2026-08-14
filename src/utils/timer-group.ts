@@ -47,6 +47,12 @@ export function normalizeTime(time: string): string {
   return `${String(Number(h)).padStart(2, '0')}:${String(Number(m)).padStart(2, '0')}`;
 }
 
+/** True when a valid range wraps past midnight (end is next calendar day). */
+export function isOvernightPeriod(startTime: string, endTime: string): boolean {
+  if (!isValidTimeRange(startTime, endTime)) return false;
+  return normalizeTime(endTime) < normalizeTime(startTime);
+}
+
 export function loopsFromSelected(selected: boolean[]): string {
   const bits = DAY_KEYS.map((_, i) => (selected[i] ? '1' : '0'));
   return bits.join('');
