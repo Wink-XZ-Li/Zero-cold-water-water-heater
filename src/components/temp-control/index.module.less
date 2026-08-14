@@ -2,7 +2,7 @@
   width: 100%;
   border-radius: 40rpx;
   overflow: hidden;
-  background: #ffffff;
+  background: var(--index-card-bg);
 }
 
 .disabled {
@@ -16,13 +16,31 @@
   overflow: visible;
 }
 
-/* 稿面 Subtract 整条顶栏：透明底 + 曲线咬口，随卡片宽度拉伸 */
-.headerBar {
+/* 左侧 64px 稿面切片，固定 128×104rpx，不随卡片拉扁 */
+.headerBite {
   position: absolute;
   left: 0;
   top: 0;
-  width: 100%;
+  width: 128rpx;
   height: 104rpx;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.headerBiteImg {
+  width: 128rpx;
+  height: 104rpx;
+  display: block;
+}
+
+.headerBarRest {
+  position: absolute;
+  left: 126rpx;
+  top: 0;
+  right: 0;
+  height: 104rpx;
+  background: #112959;
   z-index: 0;
   pointer-events: none;
 }
@@ -30,16 +48,20 @@
 .iconWrap {
   position: absolute;
   z-index: 2;
-  /* 稿面孔心 (32, 27) → rpx；图标圆略小于留白孔 */
-  left: 40rpx;
-  top: 30rpx;
+  left: 41rpx;
+  top: 32rpx;
   width: 48rpx;
   height: 48rpx;
   border-radius: 24rpx;
   background: #112959;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
+}
+
+.iconGlyph {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .headerTitle {
@@ -67,7 +89,7 @@
 }
 
 .panel {
-  background: #ffffff;
+  background: var(--index-card-bg);
   padding: 48rpx 32rpx 40rpx;
 }
 

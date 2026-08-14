@@ -16,7 +16,7 @@ import {
   tempPlusDelta,
   tempSliderStep,
 } from '@/utils/tempStep';
-import headerBarPng from './header-bar.png';
+import headerBitePng from './header-bite.png';
 import styles from './index.module.less';
 
 type Props = {
@@ -212,10 +212,14 @@ export function TempControl({ disabled }: Props) {
   return (
     <View className={`${styles.wrap} ${disabled ? styles.disabled : ''}`}>
       <View className={styles.header}>
-        {/* Ardot 55:833 Subtract 曲线顶栏（PNG，避免 Ray Svg 大图不渲染） */}
-        <Image className={styles.headerBar} src={headerBarPng} mode="scaleToFill" />
+        <View className={styles.headerBite}>
+          <Image className={styles.headerBiteImg} src={headerBitePng} mode="scaleToFill" />
+        </View>
+        <View className={styles.headerBarRest} />
         <View className={styles.iconWrap}>
-          <ShowerGlyph fill={ICON_LIGHT} size={11} />
+          <View className={styles.iconGlyph}>
+            <ShowerGlyph fill={ICON_LIGHT} size={12} />
+          </View>
         </View>
         <Text className={styles.headerTitle}>{Strings.getLang('bath_temp_set')}</Text>
         <Text className={styles.headerValue}>
