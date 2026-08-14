@@ -47,6 +47,9 @@ export default {
     zero_cold_preheat: 'Zero Cold Timer',
     zero_cold_once: 'One-shot',
     zero_cold_always: 'Always on',
+    zero_cold_hint_off: 'Tap to start one-shot zero cold water',
+    zero_cold_hint_once: 'One-shot running',
+    zero_cold_hint_schedule: 'Timer running',
     zero_cold_placeholder_title: 'Schedule',
     zero_cold_placeholder_body:
       'Timer / schedule settings will be available in a later version. This page is a reserved entry only.',
@@ -183,6 +186,9 @@ export default {
     zero_cold_preheat: '零冷水定时',
     zero_cold_once: '单次',
     zero_cold_always: '常开',
+    zero_cold_hint_off: '点击开启单次零冷水',
+    zero_cold_hint_once: '单次运行中',
+    zero_cold_hint_schedule: '定时运行中',
     zero_cold_placeholder_title: '设置定时',
     zero_cold_placeholder_body:
       '「设置定时」等能力将在后续版本提供。当前为预留入口页，暂不支持编辑定时。',
