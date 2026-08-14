@@ -13,13 +13,21 @@
 }
 
 .titleGlyph {
-  width: 32rpx;
-  height: 32rpx;
+  position: relative;
+  width: 36rpx;
+  height: 36rpx;
   margin-right: 16rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   flex-shrink: 0;
+  overflow: visible;
+}
+
+.titleGlyphSvg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translate(-50%, -50%);
 }
 
 .title {
@@ -46,6 +54,7 @@
   align-items: center;
   justify-content: flex-start;
   box-sizing: border-box;
+  flex-shrink: 0;
   transition: background-color 0.28s ease, transform 0.14s ease, opacity 0.14s ease;
 }
 
@@ -63,13 +72,14 @@
 }
 
 .iconBox {
-  width: 52rpx;
-  height: 52rpx;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 28rpx;
+  margin-bottom: 24rpx;
   flex-shrink: 0;
+  overflow: visible;
 }
 
 .chipText {

@@ -46,7 +46,9 @@ export function ModeSelector({ disabled }: Props) {
     <View className={styles.wrap}>
       <View className={styles.titleRow}>
         <View className={styles.titleGlyph}>
-          <ModeTitleGlyph fill={ICON_NAVY} size={16} />
+          <View className={styles.titleGlyphSvg}>
+            <ModeTitleGlyph fill={ICON_NAVY} size={18} />
+          </View>
         </View>
         <Text className={styles.title}>{Strings.getLang('mode')}</Text>
       </View>

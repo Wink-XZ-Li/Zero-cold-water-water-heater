@@ -93,7 +93,7 @@ export function ShowerGlyph({ fill = LIGHT, size = 11 }: IconProps) {
 }
 
 /** 「使用模式」左侧装饰 — Ardot 55:830（已 1:1） */
-export function ModeTitleGlyph({ fill = '#2B1F1D', size = 14 }: IconProps) {
+export function ModeTitleGlyph({ fill = '#2B1F1D', size = 16 }: IconProps) {
   return (
     <Svg viewBox="0 0 16 16" width={`${size}px`} height={`${size}px`}>
       <path
