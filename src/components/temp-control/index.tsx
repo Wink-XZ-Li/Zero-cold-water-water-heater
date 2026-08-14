@@ -54,20 +54,12 @@ export function TempControl({ disabled }: Props) {
   const unlockTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const confirmingRef = useRef(false);
 
-  const unlockOpts = useMemo(
-    () => ({ unlocked: highUnlocked, heating }),
-    [highUnlocked, heating]
-  );
+  const unlockOpts = useMemo(() => ({ unlocked: highUnlocked, heating }), [highUnlocked, heating]);
 
   const sliderStep = tempSliderStep(localValue);
 
   const trackWidthRpx = useMemo(
-    () =>
-      DESIGN_WIDTH_RPX -
-      PAGE_PAD_RPX * 2 -
-      BODY_PAD_RPX * 2 -
-      BTN_RPX * 2 -
-      BTN_GAP_RPX * 2,
+    () => DESIGN_WIDTH_RPX - PAGE_PAD_RPX * 2 - BODY_PAD_RPX * 2 - BTN_RPX * 2 - BTN_GAP_RPX * 2,
     []
   );
 

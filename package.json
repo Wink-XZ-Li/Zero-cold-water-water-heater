@@ -1,7 +1,7 @@
 {
-  "name": "public-sdm-template",
-  "version": "1.2.6",
-  "description": "Panel SDM Template",
+  "name": "electrolux-st1-pro-zero-cold",
+  "version": "0.0.2",
+  "description": "国内伊莱克斯零冷水燃气热水器 ST1 Pro 面板",
   "main": "index.js",
   "private": true,
   "author": "Tuya.inc",

@@ -39,10 +39,7 @@ export function BathFlowControl({ disabled }: Props) {
   const [localValue, setLocalValue] = useState(safeValue);
   const draggingRef = useRef(false);
 
-  const trackWidthRpx = useMemo(
-    () => DESIGN_WIDTH_RPX - PAGE_PAD_RPX * 2 - CARD_PAD_RPX * 2,
-    []
-  );
+  const trackWidthRpx = useMemo(() => DESIGN_WIDTH_RPX - PAGE_PAD_RPX * 2 - CARD_PAD_RPX * 2, []);
 
   useEffect(() => {
     if (!draggingRef.current) setLocalValue(safeValue);
