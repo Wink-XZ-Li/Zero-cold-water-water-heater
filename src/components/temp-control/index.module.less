@@ -1,137 +1,123 @@
 .wrap {
-  display: flex;
-  flex-direction: column;
   width: 100%;
-  overflow: hidden;
-  background: var(--index-card-bg);
   border-radius: 40rpx;
-  box-sizing: border-box;
+  overflow: hidden;
+  background: #ffffff;
 }
 
 .disabled {
   opacity: 0.45;
+  pointer-events: none;
 }
 
 .header {
   position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
   height: 104rpx;
-  padding: 0 28rpx 0 108rpx;
-  background: var(--index-accent);
-  box-sizing: border-box;
+  overflow: visible;
 }
 
-.notch {
+/* 稿面 Subtract 整条顶栏：透明底 + 曲线咬口，随卡片宽度拉伸 */
+.headerBar {
   position: absolute;
-  left: 12rpx;
-  top: 12rpx;
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 40rpx;
-  background: var(--index-card-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 104rpx;
+  z-index: 0;
+  pointer-events: none;
 }
 
-.notchInner {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: 32rpx;
-  background: var(--index-accent);
+.iconWrap {
+  position: absolute;
+  z-index: 2;
+  /* 稿面孔心 (32, 27) → rpx；图标圆略小于留白孔 */
+  left: 40rpx;
+  top: 30rpx;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 24rpx;
+  background: #112959;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .headerTitle {
-  flex: 1;
+  position: absolute;
+  z-index: 2;
+  left: 128rpx;
+  top: 0;
+  height: 104rpx;
+  line-height: 104rpx;
   font-size: 28rpx;
-  font-weight: 700;
-  color: #f5f5f5;
+  font-weight: 500;
+  color: #ffffff;
 }
 
 .headerValue {
+  position: absolute;
+  z-index: 2;
+  right: 32rpx;
+  top: 0;
+  height: 104rpx;
+  line-height: 104rpx;
   font-size: 28rpx;
   font-weight: 500;
-  color: #f5f5f5;
+  color: #ffffff;
 }
 
 .panel {
-  background: var(--index-card-bg);
+  background: #ffffff;
+  padding: 48rpx 32rpx 40rpx;
 }
 
 .body {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 28rpx 24rpx 8rpx;
-  box-sizing: border-box;
 }
 
 .btn {
-  width: 56rpx;
-  height: 56rpx;
-  border-radius: 28rpx;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 24rpx;
+  /* 稿 Ellipse 27/28 — #AABDF7，非顶栏深蓝 */
   background: var(--index-accent-muted);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.2s ease;
+}
+
+.btnHover {
+  opacity: 0.78;
+  transform: scale(0.9);
 }
 
 .btnDisabled {
   opacity: 0.4;
 }
 
-.slider {
-  position: relative;
+.sliderCol {
   flex: 1;
-  height: 56rpx;
-  margin: 0 16rpx;
-}
-
-.track {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 14rpx;
-  height: 28rpx;
-  border-radius: 20rpx;
-  background: var(--index-accent-soft);
-}
-
-.fill {
-  position: absolute;
-  left: 0;
-  top: 14rpx;
-  height: 28rpx;
-  border-radius: 20rpx;
-  background: var(--index-accent-track);
-}
-
-.thumb {
-  position: absolute;
-  top: 4rpx;
-  width: 48rpx;
-  height: 48rpx;
-  margin-left: -24rpx;
-  border-radius: 24rpx;
-  background: var(--index-accent-thumb);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .rangeRow {
+  margin-top: 16rpx;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding: 0 80rpx 24rpx;
+  padding: 0 96rpx;
   box-sizing: border-box;
 }
 
 .rangeText {
-  font-size: 20rpx;
-  color: var(--index-title-color);
-  line-height: 32rpx;
+  font-size: 24rpx;
+  font-weight: 400;
+  color: #666666;
+  line-height: 40rpx;
 }

@@ -1,5 +1,7 @@
 import React from 'react';
+import { View } from '@ray-js/ray';
 import Svg from '@ray-js/svg';
+import styles from './index.module.less';
 
 type ModeCode = 'eco' | 'kitchen' | 'bath' | 'auto_temp';
 
@@ -10,8 +12,8 @@ type Props = {
 };
 
 /** Colors aligned to Ardot mode tiles 55:797–55:816 */
-const INACTIVE = { circle: '#C5D3ED', glyph: '#FFFFFF' };
-const ACTIVE = { circle: '#F5F5F5', glyph: '#2F4573' };
+const INACTIVE_GLYPH = '#FFFFFF';
+const ACTIVE_GLYPH = '#2F4573';
 
 const GLYPHS: Record<ModeCode, { transform: string; d: string; fillRule?: 'evenodd' | 'nonzero' }> =
   {
@@ -38,17 +40,21 @@ const GLYPHS: Record<ModeCode, { transform: string; d: string; fillRule?: 'eveno
     },
   };
 
-/** Mode glyph from Ardot「方案修改」mode tiles — circle + vector */
+/** Mode glyph from Ardot「方案修改」mode tiles — 圆底 CSS 过渡 + 矢量 */
 export function ModeIcon({ code, active = false, size = 26 }: Props) {
-  const colors = active ? ACTIVE : INACTIVE;
   const glyph = GLYPHS[code];
   const px = `${size}px`;
+  const fill = active ? ACTIVE_GLYPH : INACTIVE_GLYPH;
 
   return (
-    <Svg viewBox="0 0 26 26" width={px} height={px}>
-      <circle cx="13" cy="13" r="13" fill={colors.circle} />
-      <path d={glyph.d} fill={colors.glyph} transform={glyph.transform} fillRule={glyph.fillRule} />
-    </Svg>
+    <View
+      className={`${styles.circle} ${active ? styles.circleActive : ''}`}
+      style={{ width: px, height: px }}
+    >
+      <Svg viewBox="0 0 26 26" width={px} height={px}>
+        <path d={glyph.d} fill={fill} transform={glyph.transform} fillRule={glyph.fillRule} />
+      </Svg>
+    </View>
   );
 }
 

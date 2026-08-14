@@ -49,7 +49,13 @@ export function ZeroColdEntry({ writeDisabled }: Props) {
           onChange={onToggle}
         />
       </View>
-      <View className={styles.row} onClick={onOpenPreheat}>
+      <View
+        className={styles.row}
+        hoverClassName={styles.rowHover}
+        hoverStartTime={20}
+        hoverStayTime={70}
+        onClick={onOpenPreheat}
+      >
         <View className={styles.iconWrap}>
           <PreheatGlyph fill={ICON_LIGHT} size={20} />
         </View>

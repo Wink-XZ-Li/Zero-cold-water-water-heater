@@ -79,8 +79,10 @@ export function EnergyReport() {
   return (
     <View className={styles.page}>
       <NavBar
-        title={Strings.getLang('energy_report')}
+        title=""
         leftArrow
+        border={false}
+        background="var(--index-main-bg)"
         onClickLeft={() => navigateBack()}
       />
       <ScrollView
@@ -93,7 +95,7 @@ export function EnergyReport() {
         <View className={styles.content}>
           <View className={styles.headerCard}>
             <View className={styles.headerIcon}>
-              <EnergyGlyph fill={ICON_LIGHT} size={16} />
+              <EnergyGlyph fill={ICON_LIGHT} size={13} />
             </View>
             <Text className={styles.headerTitle}>{Strings.getLang('energy_report')}</Text>
             <View className={styles.metricTrack}>

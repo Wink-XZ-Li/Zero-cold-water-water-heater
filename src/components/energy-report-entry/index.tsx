@@ -13,9 +13,15 @@ export function EnergyReportEntry() {
   };
 
   return (
-    <View className={styles.row} onClick={onOpen}>
+    <View
+      className={styles.row}
+      hoverClassName={styles.rowHover}
+      hoverStartTime={20}
+      hoverStayTime={70}
+      onClick={onOpen}
+    >
       <View className={styles.iconWrap}>
-        <EnergyGlyph fill={ICON_LIGHT} size={18} />
+        <EnergyGlyph fill={ICON_LIGHT} size={13} />
       </View>
       <Text className={styles.title}>{Strings.getLang('energy_report')}</Text>
       <View className={styles.arrow}>

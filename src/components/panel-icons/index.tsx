@@ -67,7 +67,8 @@ export function WaterfallGlyph({ fill = LIGHT, size = 18 }: IconProps) {
 }
 
 /** Energy report document — Ardot 55:951 */
-export function EnergyGlyph({ fill = LIGHT, size = 16 }: IconProps) {
+/** 能耗报告文档标 — Ardot 55:951（13×16） */
+export function EnergyGlyph({ fill = LIGHT, size = 13 }: IconProps) {
   return (
     <Svg viewBox="0 0 13 16" width={`${size}px`} height={`${(size * 16) / 13}px`}>
       <path
@@ -78,8 +79,8 @@ export function EnergyGlyph({ fill = LIGHT, size = 16 }: IconProps) {
   );
 }
 
-/** Bathroom header shower — Ardot 55:847 (padded to 1:1) */
-export function ShowerGlyph({ fill = LIGHT, size = 18 }: IconProps) {
+/** Bathroom header shower — Ardot 55:847（按稿 10.5 尺寸，1:1 画布） */
+export function ShowerGlyph({ fill = LIGHT, size = 11 }: IconProps) {
   return (
     <Svg viewBox="0 0 12 12" width={`${size}px`} height={`${size}px`}>
       <path

@@ -1,0 +1,71 @@
+/* 气泡 popup：圆角卡片 + 对准浴缸卡中心的软三角尖 */
+.bubble {
+  position: relative;
+  width: 100%;
+  /* 与首页 content gap 一致：32rpx */
+  margin-top: 32rpx;
+  padding: 28rpx 32rpx 32rpx;
+  background: #ffffff;
+  border-radius: 28rpx;
+  box-sizing: border-box;
+}
+
+.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* chip 中心 432rpx；尖角 28rpx → left ≈ 418 */
+.tip {
+  position: absolute;
+  left: 418rpx;
+  top: -11rpx;
+  width: 28rpx;
+  height: 28rpx;
+  background: #ffffff;
+  border-radius: 6rpx;
+  transform: rotate(45deg);
+  z-index: 1;
+}
+
+/* 盖住尖角落在气泡内的阴影，保持表面干净 */
+.tipMask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 24rpx;
+  background: #ffffff;
+  border-radius: 28rpx 28rpx 0 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.head {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--index-title-color);
+  line-height: 1.3;
+}
+
+.value {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--index-accent);
+  line-height: 1.3;
+}
+
+.sliderWrap {
+  position: relative;
+  z-index: 3;
+}

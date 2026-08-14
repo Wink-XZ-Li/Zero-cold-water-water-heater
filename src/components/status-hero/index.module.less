@@ -64,10 +64,21 @@
   flex-direction: row;
   align-items: center;
   height: 48rpx;
-  padding: 0 20rpx 0 16rpx;
+  max-width: 0;
+  padding: 0;
+  overflow: hidden;
+  opacity: 0;
   background: var(--index-accent-soft);
   border-radius: 40rpx;
   flex-shrink: 0;
+  box-sizing: border-box;
+  transition: max-width 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), padding 0.28s ease,
+    opacity 0.25s ease, background-color 0.3s ease;
+}
+
+.badgeOpen {
+  opacity: 1;
+  padding: 0 20rpx 0 16rpx;
 }
 
 .dot {
@@ -76,6 +87,7 @@
   border-radius: 6rpx;
   margin-right: 10rpx;
   flex-shrink: 0;
+  transition: background-color 0.3s ease;
 }
 
 .dotHeating {
