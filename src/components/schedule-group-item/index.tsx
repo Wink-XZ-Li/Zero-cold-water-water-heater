@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from '@ray-js/ray';
 import { Switch, SwipeCell } from '@ray-js/smart-ui';
 import Strings from '@/i18n';
-import { isOvernightPeriod, loopsSummary, type TimerGroup } from '@/utils/timer-group';
+import { isOvernightPeriod, loopsSummary, formatOnceDateLabel, type TimerGroup } from '@/utils/timer-group';
 import styles from './index.module.less';
 
 type Props = {
@@ -59,11 +59,19 @@ export function ScheduleGroupItem({
     Strings.getLang('schedule_day_fri'),
     Strings.getLang('schedule_day_sat'),
   ];
-  const summary = loopsSummary(group.loops, {
-    everyDay: Strings.getLang('schedule_every_day'),
-    weekdays: Strings.getLang('schedule_weekdays'),
-    days,
-  });
+  const summary = loopsSummary(
+    group.loops,
+    {
+      once: Strings.getLang('schedule_repeat_once'),
+      everyDay: Strings.getLang('schedule_every_day'),
+      weekdays: Strings.getLang('schedule_weekdays'),
+      days,
+    },
+    formatOnceDateLabel(
+      group.date,
+      Strings.getLang('schedule_every_day') === '每天' ? 'zh' : 'en'
+    )
+  );
 
   const card = (
     <View

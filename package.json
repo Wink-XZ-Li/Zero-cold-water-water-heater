@@ -9,7 +9,8 @@
   "scripts": {
     "start": "ray start --target tuya",
     "build": "ray build --target tuya",
-    "lint": "eslint src --ext .js,.jsx,.ts,.tsx --fix"
+    "lint": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
+    "test": "esbuild tests/tempStep.test.ts --bundle --platform=node --format=cjs --outfile=.tmp/tempStep.test.js && node .tmp/tempStep.test.js && esbuild tests/onceWindow.test.ts --bundle --platform=node --format=cjs --outfile=.tmp/onceWindow.test.js && node .tmp/onceWindow.test.js"
   },
   "dependencies": {
     "@ray-js/panel-sdk": "^1.14.1",

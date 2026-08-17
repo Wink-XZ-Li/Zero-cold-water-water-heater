@@ -4,12 +4,17 @@ import { NavBar, Switch, Popup, DatetimePicker, Dialog, DialogInstance } from '@
 import Strings from '@/i18n';
 import { useTimerGroups } from '@/hooks/useTimerGroups';
 import {
+  ALL_DAYS_SELECTED,
+  WEEKDAY_SELECTED,
   isOvernightPeriod,
-  isValidLoops,
   isValidTimeRange,
+  loopsFromRepeatMode,
   loopsFromSelected,
+  loopsSummary,
   normalizeTime,
+  repeatModeFromLoops,
   selectedFromLoops,
+  type RepeatMode,
 } from '@/utils/timer-group';
 import { toastScheduleProgress, toastScheduleSuccess } from '@/utils/schedule-toast';
 import styles from './index.module.less';
@@ -41,12 +46,14 @@ export function ZeroColdScheduleEdit() {
 
   const [startTime, setStartTime] = useState('06:00');
   const [endTime, setEndTime] = useState('08:00');
-  const [selected, setSelected] = useState<boolean[]>([false, true, true, true, true, true, false]);
+  const [repeatMode, setRepeatMode] = useState<RepeatMode>('once');
+  const [selected, setSelected] = useState<boolean[]>([...WEEKDAY_SELECTED]);
   const [isAppPush, setIsAppPush] = useState(false);
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState(false);
   const [picker, setPicker] = useState<PickerTarget>(null);
   const [pickerValue, setPickerValue] = useState('06:00');
+  const [repeatPicker, setRepeatPicker] = useState(false);
   const [hydrated, setHydrated] = useState(mode === 'create');
 
   const dayLabels = [
@@ -58,6 +65,21 @@ export function ZeroColdScheduleEdit() {
     Strings.getLang('schedule_day_fri'),
     Strings.getLang('schedule_day_sat'),
   ];
+  const summaryLabels = {
+    once: Strings.getLang('schedule_repeat_once'),
+    everyDay: Strings.getLang('schedule_every_day'),
+    weekdays: Strings.getLang('schedule_weekdays'),
+    days: dayLabels,
+  };
+
+  const applyGroup = (group: { startTime: string; endTime: string; loops: string; isAppPush: boolean }) => {
+    const nextMode = repeatModeFromLoops(group.loops);
+    setStartTime(group.startTime);
+    setEndTime(group.endTime);
+    setRepeatMode(nextMode);
+    setSelected(nextMode === 'once' ? [...WEEKDAY_SELECTED] : selectedFromLoops(group.loops));
+    setIsAppPush(!!group.isAppPush);
+  };
 
   useEffect(() => {
     if (mode !== 'edit' || !aliasName) {
@@ -66,22 +88,14 @@ export function ZeroColdScheduleEdit() {
     }
     const group = groups.find(g => g.aliasName === aliasName && !g.orphan);
     if (group) {
-      setStartTime(group.startTime);
-      setEndTime(group.endTime);
-      setSelected(selectedFromLoops(group.loops));
-      setIsAppPush(!!group.isAppPush);
+      applyGroup(group);
       setHydrated(true);
       return;
     }
     if (!loading) {
       refresh().then(list => {
         const found = list.find(g => g.aliasName === aliasName && !g.orphan);
-        if (found) {
-          setStartTime(found.startTime);
-          setEndTime(found.endTime);
-          setSelected(selectedFromLoops(found.loops));
-          setIsAppPush(!!found.isAppPush);
-        }
+        if (found) applyGroup(found);
         setHydrated(true);
       });
     }
@@ -100,12 +114,37 @@ export function ZeroColdScheduleEdit() {
   };
 
   const toggleDay = (index: number) => {
-    setSelected(prev => prev.map((v, i) => (i === index ? !v : v)));
+    const next = selected.map((v, i) => (i === index ? !v : v));
+    if (next.every(Boolean)) {
+      setRepeatMode('daily');
+      setSelected([...ALL_DAYS_SELECTED]);
+      return;
+    }
+    setSelected(next);
   };
 
+  const pickRepeat = (next: RepeatMode) => {
+    if (next === 'custom') {
+      if (repeatMode === 'daily') setSelected([...ALL_DAYS_SELECTED]);
+      else if (repeatMode === 'once') setSelected([...WEEKDAY_SELECTED]);
+    } else if (next === 'daily') {
+      setSelected([...ALL_DAYS_SELECTED]);
+    }
+    setRepeatMode(next);
+    setRepeatPicker(false);
+  };
+
+  const repeatValue =
+    repeatMode === 'once'
+      ? Strings.getLang('schedule_repeat_once')
+      : repeatMode === 'daily'
+        ? Strings.getLang('schedule_every_day')
+        : loopsSummary(loopsFromSelected(selected), summaryLabels) ||
+          Strings.getLang('schedule_repeat_custom');
+
   const onSave = async () => {
-    const loops = loopsFromSelected(selected);
-    if (!isValidLoops(loops)) {
+    const loops = loopsFromRepeatMode(repeatMode, selected);
+    if (repeatMode === 'custom' && !selected.some(Boolean)) {
       showToast({ title: Strings.getLang('schedule_invalid_loops'), icon: 'none' });
       return;
     }
@@ -190,27 +229,38 @@ export function ZeroColdScheduleEdit() {
         style={{ flex: 1, height: '100%' }}
       >
         <View className={styles.content}>
-          <Text className={styles.sectionTitle}>{Strings.getLang('schedule_repeat')}</Text>
           <View className={styles.card}>
-            <View className={styles.days}>
-              {dayLabels.map((label, index) => {
-                const on = selected[index];
-                return (
-                  <View
-                    key={label}
-                    className={`${styles.day} ${on ? styles.dayOn : ''}`}
-                    hoverClassName={styles.dayHover}
-                    hoverStartTime={10}
-                    hoverStayTime={70}
-                    onClick={() => toggleDay(index)}
-                  >
-                    <Text className={`${styles.dayText} ${on ? styles.dayTextOn : ''}`}>
-                      {label}
-                    </Text>
-                  </View>
-                );
-              })}
+            <View
+              className={styles.row}
+              hoverClassName={styles.rowHover}
+              hoverStartTime={20}
+              hoverStayTime={100}
+              onClick={() => setRepeatPicker(true)}
+            >
+              <Text className={styles.label}>{Strings.getLang('schedule_repeat')}</Text>
+              <Text className={styles.value}>{repeatValue}</Text>
             </View>
+            {repeatMode === 'custom' ? (
+              <View className={styles.days}>
+                {dayLabels.map((label, index) => {
+                  const on = selected[index];
+                  return (
+                    <View
+                      key={label}
+                      className={`${styles.day} ${on ? styles.dayOn : ''}`}
+                      hoverClassName={styles.dayHover}
+                      hoverStartTime={10}
+                      hoverStayTime={70}
+                      onClick={() => toggleDay(index)}
+                    >
+                      <Text className={`${styles.dayText} ${on ? styles.dayTextOn : ''}`}>
+                        {label}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
+            ) : null}
           </View>
 
           <View className={styles.card}>
@@ -288,6 +338,34 @@ export function ZeroColdScheduleEdit() {
         ) : null}
       </View>
       <Dialog id="smart-dialog" />
+
+      <Popup show={repeatPicker} position="bottom" round onClose={() => setRepeatPicker(false)}>
+        <View className={styles.repeatPanel}>
+          <Text className={styles.repeatPanelTitle}>{Strings.getLang('schedule_repeat')}</Text>
+          {(
+            [
+              ['once', 'schedule_repeat_once'],
+              ['daily', 'schedule_every_day'],
+              ['custom', 'schedule_repeat_custom'],
+            ] as const
+          ).map(([key, labelKey]) => {
+            const on = repeatMode === key;
+            return (
+              <View
+                key={key}
+                className={styles.repeatOption}
+                hoverClassName={styles.rowHover}
+                hoverStartTime={20}
+                hoverStayTime={100}
+                onClick={() => pickRepeat(key)}
+              >
+                <Text className={styles.repeatOptionText}>{Strings.getLang(labelKey)}</Text>
+                {on ? <Text className={styles.repeatOptionCheck}>✓</Text> : null}
+              </View>
+            );
+          })}
+        </View>
+      </Popup>
 
       <Popup show={!!picker} position="bottom" round onClose={() => setPicker(null)}>
         <View className={styles.pickerPanel}>

@@ -7,7 +7,6 @@ import { useTempSetGuard } from '@/hooks/useTempSetGuard';
 import Strings from '@/i18n';
 import { ICON_LIGHT, MinusGlyph, PlusGlyph, ShowerGlyph } from '@/components/panel-icons';
 import {
-  TEMP_COARSE_STEP,
   TEMP_HIGH_GATE,
   isHeatingWorkState,
   quantizeTemp,
@@ -34,7 +33,8 @@ const DESIGN_WIDTH_RPX = 750;
 
 /**
  * Bathroom temp card — Ardot 55:832
- * 「+」加热态在 50℃ 再上调需弹窗；滑条松手目标 ≥50℃ 同样需解锁；解锁后可至上限。
+ * 「+」加热态从 49 调至 50℃ 需弹窗并落到 50；已在 50 未解锁再上调同样需解锁后到 55。
+ * 滑条松手目标 ≥50℃ 仍弹窗，确认后落到松手刻度；解锁后可至上限。
  */
 export function TempControl({ disabled }: Props) {
   const tempSetRaw = useProps(p => p.temp_set as number);
@@ -47,7 +47,7 @@ export function TempControl({ disabled }: Props) {
   const safeValue = Number.isFinite(setDisplay) ? setDisplay : min;
 
   const [localValue, setLocalValue] = useState(safeValue);
-  /** >50 视为已在高温区；=50 仍可能未解锁（由「+」细步进到达） */
+  /** >50 视为已在高温区；=50 仍可能未解锁 */
   const [highUnlocked, setHighUnlocked] = useState(safeValue > TEMP_HIGH_GATE);
   const draggingRef = useRef(false);
   const dragStartRef = useRef(safeValue);
@@ -136,7 +136,7 @@ export function TempControl({ disabled }: Props) {
     if (result.kind === 'need_unlock') {
       const ok = await requestHighUnlock();
       if (!ok) return;
-      commitValue(localValue + TEMP_COARSE_STEP, {
+      commitValue(result.next, {
         silent: true,
         unlockOpts: { unlocked: true, heating, enforceUnlockGate: false },
       });
@@ -247,12 +247,11 @@ export function TempControl({ disabled }: Props) {
             minTrackWidth="48rpx"
             minTrackRadius="24rpx"
             minTrackColor="#AEBFE7"
-            thumbWidth="48rpx"
-            thumbHeight="48rpx"
-            thumbRadius="24rpx"
+            thumbWidth="56rpx"
+            thumbHeight="56rpx"
+            thumbRadius="28rpx"
             thumbColor="#2F4573"
-            thumbBorderStyle="solid"
-            thumbBoxShadowStyle="0 0 0 4rpx #FFFFFF"
+            thumbBoxShadowStyle="0 0 0 6rpx #FFFFFF"
             isShowTicks={false}
           />
           <View

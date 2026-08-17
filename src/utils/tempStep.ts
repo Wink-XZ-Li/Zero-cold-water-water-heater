@@ -1,4 +1,4 @@
-/** 加热态：「+」在 50℃ 再上调需解锁；滑条目标 ≥50℃ 也需解锁一次 */
+/** 加热态：「+」从 49 调至 50℃ 需解锁；已在 50 未解锁再上调同样需解锁；滑条松手 ≥50℃ 也需解锁一次 */
 
 export const TEMP_HIGH_GATE = 50;
 export const TEMP_FINE_STEP = 1;
@@ -22,12 +22,15 @@ export function isCoarseTempZone(
 export function tempPlusDelta(
   value: number,
   opts: { unlocked: boolean; heating: boolean }
-): { kind: 'need_unlock' } | { kind: 'step'; delta: number } {
+): { kind: 'need_unlock'; next: number } | { kind: 'step'; delta: number } {
   if (value < TEMP_HIGH_GATE) {
+    if (opts.heating && !opts.unlocked && value + TEMP_FINE_STEP >= TEMP_HIGH_GATE) {
+      return { kind: 'need_unlock', next: TEMP_HIGH_GATE };
+    }
     return { kind: 'step', delta: TEMP_FINE_STEP };
   }
   if (value === TEMP_HIGH_GATE && opts.heating && !opts.unlocked) {
-    return { kind: 'need_unlock' };
+    return { kind: 'need_unlock', next: TEMP_HIGH_GATE + TEMP_COARSE_STEP };
   }
   return { kind: 'step', delta: TEMP_COARSE_STEP };
 }
