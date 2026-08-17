@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, navigateTo } from '@ray-js/ray';
 import Strings from '@/i18n';
+import { ArrowRightGlyph, EnergyGlyph, ICON_LIGHT, ICON_NAVY } from '@/components/panel-icons';
 import styles from './index.module.less';
 
 /**
@@ -12,12 +13,20 @@ export function EnergyReportEntry() {
   };
 
   return (
-    <View className={styles.row} onClick={onOpen}>
+    <View
+      className={styles.row}
+      hoverClassName={styles.rowHover}
+      hoverStartTime={20}
+      hoverStayTime={70}
+      onClick={onOpen}
+    >
       <View className={styles.iconWrap}>
-        <Text className={styles.icon}>报</Text>
+        <EnergyGlyph fill={ICON_LIGHT} size={13} />
       </View>
       <Text className={styles.title}>{Strings.getLang('energy_report')}</Text>
-      <Text className={styles.arrow}>›</Text>
+      <View className={styles.arrow}>
+        <ArrowRightGlyph fill={ICON_NAVY} size={12} />
+      </View>
     </View>
   );
 }

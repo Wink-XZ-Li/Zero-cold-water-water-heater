@@ -46,6 +46,11 @@ If you have any questions, please visit the link and submit post feedback: https
 
 ## 8. Changelog
 
+### [0.0.2] - 2026-08-14
+
+- First feature-complete ST1 Pro panel release (homepage, zero-cold timers, waterfall bath, energy report, UX polish)
+- Bump package identity off the SDM template (`1.2.6` → `0.0.2`)
+
 ### [1.2.6] - 2025-11-27
 
 - Package size optimization, removed redundant code, SmartUI on-demand loading, etc.

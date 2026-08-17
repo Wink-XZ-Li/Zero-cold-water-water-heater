@@ -26,6 +26,11 @@ export type ScheduleFormValue = {
   isAppPush: boolean;
 };
 
+export type RefreshOptions = {
+  /** Skip the list loading flag so ScrollView pull-refresh does not animate. */
+  silent?: boolean;
+};
+
 export function useTimerGroups() {
   const deviceId = useDevice(d => d.devInfo?.devId || '') as string;
   const [timers, setTimers] = useState<CloudTimer[]>([]);
@@ -33,28 +38,31 @@ export function useTimerGroups() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const refresh = useCallback(async () => {
-    if (!deviceId) {
-      setLoading(false);
-      setError('missing_device');
-      return [];
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const list = await syncTimers(deviceId, TIMER_CATEGORY);
-      setTimers(list);
-      const next = toTimerGroups(list);
-      setGroups(next);
-      return next;
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'sync_failed';
-      setError(msg);
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }, [deviceId]);
+  const refresh = useCallback(
+    async (opts?: RefreshOptions) => {
+      if (!deviceId) {
+        setLoading(false);
+        setError('missing_device');
+        return [];
+      }
+      if (!opts?.silent) setLoading(true);
+      setError(null);
+      try {
+        const list = await syncTimers(deviceId, TIMER_CATEGORY);
+        setTimers(list);
+        const next = toTimerGroups(list);
+        setGroups(next);
+        return next;
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : 'sync_failed';
+        setError(msg);
+        return [];
+      } finally {
+        if (!opts?.silent) setLoading(false);
+      }
+    },
+    [deviceId]
+  );
 
   useEffect(() => {
     refresh();
@@ -74,10 +82,10 @@ export function useTimerGroups() {
         } catch {
           // refresh will reconcile
         }
-        await refresh();
+        await refresh({ silent: true });
         throw e;
       }
-      await refresh();
+      await refresh({ silent: true });
     },
     [deviceId, refresh]
   );
@@ -112,10 +120,10 @@ export function useTimerGroups() {
         } catch {
           // ignore rollback secondary failure
         }
-        await refresh();
+        await refresh({ silent: true });
         throw e;
       }
-      await refresh();
+      await refresh({ silent: true });
       return aliasName;
     },
     [deviceId, refresh]
@@ -147,10 +155,10 @@ export function useTimerGroups() {
           isAppPush: form.isAppPush,
         });
       } catch (e) {
-        await refresh();
+        await refresh({ silent: true });
         throw e;
       }
-      await refresh();
+      await refresh({ silent: true });
     },
     [deviceId, refresh]
   );
@@ -162,7 +170,7 @@ export function useTimerGroups() {
       const related = timers.filter(t => t.aliasName === group.aliasName).map(t => t.timerId);
       const unique = Array.from(new Set([...ids, ...related]));
       const results = await Promise.allSettled(unique.map(id => removeDeviceTimer(deviceId, id)));
-      await refresh();
+      await refresh({ silent: true });
       if (results.some(r => r.status === 'rejected')) {
         throw new Error('remove_partial');
       }

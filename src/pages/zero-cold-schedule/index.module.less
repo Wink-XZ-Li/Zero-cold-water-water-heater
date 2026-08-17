@@ -4,7 +4,7 @@
   width: 100%;
   height: 100vh;
   overflow: hidden;
-  background: var(--index-main-bg);
+  background: var(--index-card-bg);
   box-sizing: border-box;
 }
 
@@ -19,17 +19,32 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
+  gap: 0;
   width: 100%;
-  padding: 32rpx 32rpx 180rpx;
+  padding: 0 0 180rpx;
+  box-sizing: border-box;
+}
+
+.emptyWrap {
+  min-height: 480rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48rpx 48rpx 0;
   box-sizing: border-box;
 }
 
 .empty {
-  margin-top: 120rpx;
   text-align: center;
   font-size: 28rpx;
-  color: var(--index-accent-muted);
+  color: var(--index-text-secondary);
+  line-height: 1.6;
+}
+
+.error {
+  text-align: center;
+  font-size: 28rpx;
+  color: var(--index-accent);
   line-height: 1.6;
 }
 
@@ -45,6 +60,12 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 8rpx 24rpx rgba(17, 41, 89, 0.28);
+  transition: transform 0.14s ease, opacity 0.14s ease;
+}
+
+.fabHover {
+  opacity: 0.88;
+  transform: scale(0.92);
 }
 
 .fabText {
@@ -56,6 +77,7 @@
 
 .debugEntry {
   align-self: flex-start;
+  margin: 24rpx 32rpx 8rpx;
   padding: 12rpx 28rpx;
   border-radius: 32rpx;
   background: var(--index-accent-soft);

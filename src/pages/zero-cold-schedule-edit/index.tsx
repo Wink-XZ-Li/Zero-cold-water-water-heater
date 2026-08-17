@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, navigateBack, showToast, useQuery } from '@ray-js/ray';
-import { NavBar, Switch, Popup, DatetimePicker } from '@ray-js/smart-ui';
+import { NavBar, Switch, Popup, DatetimePicker, Dialog, DialogInstance } from '@ray-js/smart-ui';
 import Strings from '@/i18n';
 import { useTimerGroups } from '@/hooks/useTimerGroups';
 import {
+  isOvernightPeriod,
   isValidLoops,
   isValidTimeRange,
   loopsFromSelected,
   normalizeTime,
   selectedFromLoops,
 } from '@/utils/timer-group';
+import { toastScheduleProgress, toastScheduleSuccess } from '@/utils/schedule-toast';
 import styles from './index.module.less';
 
 type PickerTarget = 'start' | 'end' | null;
@@ -35,13 +37,14 @@ export function ZeroColdScheduleEdit() {
   const query = useQuery() as { mode?: string; aliasName?: string };
   const mode = query?.mode === 'edit' ? 'edit' : 'create';
   const aliasName = query?.aliasName ? decodeURIComponent(String(query.aliasName)) : '';
-  const { groups, loading, createGroup, updateGroup, refresh } = useTimerGroups();
+  const { groups, loading, createGroup, updateGroup, removeGroup, refresh } = useTimerGroups();
 
   const [startTime, setStartTime] = useState('06:00');
   const [endTime, setEndTime] = useState('08:00');
   const [selected, setSelected] = useState<boolean[]>([false, true, true, true, true, true, false]);
   const [isAppPush, setIsAppPush] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [removing, setRemoving] = useState(false);
   const [picker, setPicker] = useState<PickerTarget>(null);
   const [pickerValue, setPickerValue] = useState('06:00');
   const [hydrated, setHydrated] = useState(mode === 'create');
@@ -112,6 +115,8 @@ export function ZeroColdScheduleEdit() {
     }
 
     setSaving(true);
+    const op = mode === 'edit' ? 'update' : 'add';
+    toastScheduleProgress(op);
     try {
       if (mode === 'edit') {
         const group = groups.find(g => g.aliasName === aliasName && !g.orphan);
@@ -120,11 +125,42 @@ export function ZeroColdScheduleEdit() {
       } else {
         await createGroup({ startTime, endTime, loops, isAppPush });
       }
+      toastScheduleSuccess(op);
       navigateBack();
     } catch {
       showToast({ title: Strings.getLang('schedule_save_failed'), icon: 'none' });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const onRemove = async () => {
+    if (mode !== 'edit' || removing || saving) return;
+    const group = groups.find(g => g.aliasName === aliasName && !g.orphan);
+    if (!group) {
+      showToast({ title: Strings.getLang('schedule_delete_failed'), icon: 'none' });
+      return;
+    }
+    try {
+      await DialogInstance.confirm({
+        title: Strings.getLang('schedule_delete_title'),
+        message: Strings.getLang('schedule_delete_message'),
+        confirmButtonText: Strings.getLang('confirm'),
+        cancelButtonText: Strings.getLang('cancel'),
+      });
+    } catch {
+      return;
+    }
+    setRemoving(true);
+    toastScheduleProgress('delete');
+    try {
+      await removeGroup(group);
+      toastScheduleSuccess('delete');
+      navigateBack();
+    } catch {
+      showToast({ title: Strings.getLang('schedule_delete_failed'), icon: 'none' });
+    } finally {
+      setRemoving(false);
     }
   };
 
@@ -163,6 +199,9 @@ export function ZeroColdScheduleEdit() {
                   <View
                     key={label}
                     className={`${styles.day} ${on ? styles.dayOn : ''}`}
+                    hoverClassName={styles.dayHover}
+                    hoverStartTime={10}
+                    hoverStayTime={70}
                     onClick={() => toggleDay(index)}
                   >
                     <Text className={`${styles.dayText} ${on ? styles.dayTextOn : ''}`}>
@@ -175,13 +214,29 @@ export function ZeroColdScheduleEdit() {
           </View>
 
           <View className={styles.card}>
-            <View className={styles.row} onClick={() => openPicker('start')}>
+            <View
+              className={styles.row}
+              hoverClassName={styles.rowHover}
+              hoverStartTime={20}
+              hoverStayTime={100}
+              onClick={() => openPicker('start')}
+            >
               <Text className={styles.label}>{Strings.getLang('schedule_start_time')}</Text>
               <Text className={styles.value}>{startTime}</Text>
             </View>
-            <View className={styles.row} onClick={() => openPicker('end')}>
+            <View
+              className={styles.row}
+              hoverClassName={styles.rowHover}
+              hoverStartTime={20}
+              hoverStayTime={100}
+              onClick={() => openPicker('end')}
+            >
               <Text className={styles.label}>{Strings.getLang('schedule_end_time')}</Text>
-              <Text className={styles.value}>{endTime}</Text>
+              <Text className={styles.value}>
+                {isOvernightPeriod(startTime, endTime)
+                  ? `${Strings.getLang('schedule_next_day')} ${endTime}`
+                  : endTime}
+              </Text>
             </View>
           </View>
 
@@ -204,14 +259,35 @@ export function ZeroColdScheduleEdit() {
 
       <View className={styles.footer}>
         <View
-          className={`${styles.saveBtn} ${saving || !hydrated ? styles.saveBtnDisabled : ''}`}
+          className={`${styles.saveBtn} ${
+            saving || removing || !hydrated ? styles.saveBtnDisabled : ''
+          }`}
+          hoverClassName={saving || removing || !hydrated ? undefined : styles.saveBtnHover}
+          hoverStartTime={20}
+          hoverStayTime={70}
           onClick={() => {
-            if (!saving && hydrated) onSave();
+            if (!saving && !removing && hydrated) onSave();
           }}
         >
-          <Text className={styles.saveBtnText}>{saving ? '...' : Strings.getLang('save')}</Text>
+          <Text className={styles.saveBtnText}>
+            {saving ? Strings.getLang('schedule_saving') : Strings.getLang('save')}
+          </Text>
         </View>
+        {mode === 'edit' ? (
+          <View
+            className={`${styles.deleteBtn} ${removing ? styles.deleteBtnDisabled : ''}`}
+            hoverClassName={removing || saving ? undefined : styles.deleteBtnHover}
+            hoverStartTime={20}
+            hoverStayTime={70}
+            onClick={() => {
+              if (!removing && !saving && hydrated) onRemove();
+            }}
+          >
+            <Text className={styles.deleteBtnText}>{Strings.getLang('delete')}</Text>
+          </View>
+        ) : null}
       </View>
+      <Dialog id="smart-dialog" />
 
       <Popup show={!!picker} position="bottom" round onClose={() => setPicker(null)}>
         <View className={styles.pickerPanel}>

@@ -19,64 +19,111 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
+  gap: 32rpx;
   width: 100%;
   padding: 32rpx 32rpx 120rpx;
   box-sizing: border-box;
 }
 
-.card {
+.headerCard {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   width: 100%;
-  padding: 28rpx;
+  height: 128rpx;
+  padding: 0 24rpx 0 28rpx;
   background: var(--index-card-bg);
   border-radius: var(--index-card-radius);
   box-sizing: border-box;
 }
 
-.metricRow {
+.headerIcon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 32rpx;
+  background: var(--index-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--index-title-color);
+  line-height: 1.3;
+}
+
+.metricTrack {
   display: flex;
   flex-direction: row;
-  align-self: flex-end;
-  padding: 6rpx;
-  border-radius: 40rpx;
-  background: var(--index-accent-soft);
-  margin-bottom: 24rpx;
+  align-items: center;
+  height: 72rpx;
+  padding: 4rpx;
+  border-radius: 36rpx;
+  background: var(--index-hero-bg);
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .metricChip {
-  padding: 12rpx 28rpx;
+  height: 64rpx;
+  padding: 0 24rpx;
   border-radius: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .metricChipOn {
-  background: var(--index-accent);
+  background: #ffffff;
 }
 
 .metricText {
   font-size: 24rpx;
-  color: var(--index-title-color);
+  font-weight: 500;
+  line-height: 1;
+  color: #f5f5f5;
 }
 
 .metricTextOn {
-  color: #ffffff;
+  color: var(--index-title-color);
 }
 
-.periodRow {
+.board {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 24rpx 24rpx 32rpx;
+  background: var(--index-energy-board);
+  border-radius: var(--index-card-radius);
+  box-sizing: border-box;
+}
+
+.periodTrack {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  margin-bottom: 24rpx;
+  align-items: center;
+  height: 72rpx;
+  padding: 4rpx;
+  border-radius: 36rpx;
+  background: #ffffff;
+  box-sizing: border-box;
 }
 
 .periodChip {
   flex: 1;
-  margin: 0 6rpx;
-  padding: 16rpx 0;
-  border-radius: 24rpx;
-  background: var(--index-accent-soft);
-  text-align: center;
+  height: 64rpx;
+  padding: 0;
+  border-radius: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .periodChipOn {
@@ -84,8 +131,10 @@
 }
 
 .periodText {
-  font-size: 26rpx;
-  color: var(--index-title-color);
+  font-size: 32rpx;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--index-accent);
 }
 
 .periodTextOn {
@@ -97,67 +146,67 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8rpx;
+  padding: 28rpx 8rpx 24rpx;
 }
 
 .arrowBtn {
-  width: 48rpx;
-  height: 48rpx;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 28rpx;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.arrowText {
-  font-size: 56rpx;
-  line-height: 48rpx;
-  color: var(--index-accent-muted);
+.datePicker {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .dateLabel {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: var(--index-title-color);
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #ffffff;
   min-width: 240rpx;
   text-align: center;
 }
 
-.usageText {
-  font-size: 24rpx;
-  color: var(--index-accent-muted);
-  text-align: center;
-  padding: 12rpx 0 8rpx;
+.chartCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 24rpx 16rpx 16rpx;
+  background: #ffffff;
+  border-radius: 40rpx;
+  box-sizing: border-box;
 }
 
-.usageValue {
-  font-weight: 700;
+.chartTitle {
+  font-size: 28rpx;
+  font-weight: 400;
   color: var(--index-title-color);
-  padding: 0 4px;
+  text-align: center;
+  padding-bottom: 8rpx;
 }
 
 .chartBody {
   width: 100%;
-  min-height: 480rpx;
+  min-height: 640rpx;
 }
 
 .chartEmpty {
   flex: 1;
-  min-height: 400rpx;
-  border-radius: 24rpx;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent,
-    transparent 54rpx,
-    rgba(17, 41, 89, 0.08) 54rpx,
-    rgba(17, 41, 89, 0.08) 56rpx
-  );
+  min-height: 560rpx;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .chartEmptyText {
-  font-size: 24rpx;
+  font-size: 26rpx;
   color: var(--index-accent-muted);
   padding: 0 32rpx;
   text-align: center;
@@ -165,9 +214,10 @@
 }
 
 .errorHint {
-  margin-top: 20rpx;
-  font-size: 22rpx;
-  color: var(--index-accent-muted);
+  margin-top: 24rpx;
+  font-size: 28rpx;
+  font-weight: 400;
+  color: #ffffff;
   line-height: 1.4;
   text-align: center;
 }

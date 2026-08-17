@@ -1,7 +1,7 @@
 {
-  "name": "public-sdm-template",
-  "version": "1.2.6",
-  "description": "Panel SDM Template",
+  "name": "electrolux-st1-pro-zero-cold",
+  "version": "0.0.2",
+  "description": "国内伊莱克斯零冷水燃气热水器 ST1 Pro 面板",
   "main": "index.js",
   "private": true,
   "author": "Tuya.inc",
@@ -15,13 +15,18 @@
     "@ray-js/panel-sdk": "^1.14.1",
     "@ray-js/ray": "^1.7.55",
     "@ray-js/ray-error-catch": "^0.0.26",
+    "@ray-js/components-ty-slider": "^0.3.7",
     "@ray-js/smart-ui": "^2.7.2",
     "@ray-js/stat-charts": "^2.2.0",
+    "@ray-js/svg": "^0.1.8",
     "@reduxjs/toolkit": "^1.9.3",
     "clsx": "^1.2.1",
     "dayjs": "^1.11.21",
     "react-redux": "^7.2.1",
-    "redux-logger": "^3.0.6"
+    "redux-logger": "^3.0.6",
+    "htm": "3.1.1",
+    "preact": "10.10.0",
+    "preact-render-to-string": "5.2.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.2.1",

@@ -1,18 +1,21 @@
 import React from 'react';
 import { View, Text } from '@ray-js/ray';
-import { Switch } from '@ray-js/smart-ui';
+import { Switch, SwipeCell } from '@ray-js/smart-ui';
 import Strings from '@/i18n';
-import { loopsSummary, type TimerGroup } from '@/utils/timer-group';
+import { isOvernightPeriod, loopsSummary, type TimerGroup } from '@/utils/timer-group';
 import styles from './index.module.less';
 
 type Props = {
   group: TimerGroup;
   toggling?: boolean;
+  leaving?: boolean;
   onToggle?: (enabled: boolean) => void;
   onPress?: () => void;
   onDelete?: () => void;
   onCleanup?: () => void;
 };
+
+const SWIPE_DELETE_WIDTH = 80;
 
 function readChecked(event: unknown): boolean {
   if (typeof event === 'boolean') return event;
@@ -26,13 +29,22 @@ function readChecked(event: unknown): boolean {
   return false;
 }
 
+function timeTitle(group: TimerGroup): string {
+  const end = isOvernightPeriod(group.startTime, group.endTime)
+    ? `${Strings.getLang('schedule_next_day')} ${group.endTime}`
+    : group.endTime;
+  return `${group.startTime} - ${end}`;
+}
+
 /**
  * Row text opens edit; Switch is a sibling (not child of text hit area)
  * so Ray click bubbling cannot navigate while toggling.
+ * Complete groups swipe to reveal delete; orphans keep an on-row cleanup.
  */
 export function ScheduleGroupItem({
   group,
   toggling,
+  leaving,
   onToggle,
   onPress,
   onDelete,
@@ -53,13 +65,16 @@ export function ScheduleGroupItem({
     days,
   });
 
-  return (
-    <View className={`${styles.item} ${group.orphan ? styles.orphan : ''}`}>
+  const card = (
+    <View
+      className={`${styles.item} ${group.orphan ? styles.orphan : ''}`}
+      hoverClassName={leaving || group.orphan ? undefined : styles.itemHover}
+      hoverStartTime={20}
+      hoverStayTime={120}
+    >
       <View className={styles.main}>
-        <View className={styles.textCol} onClick={group.orphan ? undefined : onPress}>
-          <Text className={styles.time}>
-            {group.startTime} - {group.endTime}
-          </Text>
+        <View className={styles.textCol} onClick={group.orphan || leaving ? undefined : onPress}>
+          <Text className={styles.time}>{timeTitle(group)}</Text>
           {group.orphan ? (
             <Text className={styles.sub}>{Strings.getLang('schedule_orphan')}</Text>
           ) : (
@@ -73,7 +88,7 @@ export function ScheduleGroupItem({
           <View className={styles.switchWrap}>
             <Switch
               checked={group.enabled}
-              disabled={!!toggling}
+              disabled={!!toggling || !!leaving}
               activeColor="var(--index-accent)"
               onChange={(event: unknown) => {
                 onToggle?.(readChecked(event));
@@ -82,17 +97,44 @@ export function ScheduleGroupItem({
           </View>
         )}
       </View>
-      <View className={styles.actions}>
-        {group.orphan ? (
+      {group.orphan ? (
+        <View className={styles.actions}>
           <Text className={styles.actionDanger} onClick={onCleanup}>
             {Strings.getLang('schedule_cleanup')}
           </Text>
-        ) : (
-          <Text className={styles.actionDanger} onClick={onDelete}>
-            {Strings.getLang('delete')}
-          </Text>
-        )}
-      </View>
+        </View>
+      ) : null}
+    </View>
+  );
+
+  const wrapClass = `${styles.rowWrap} ${leaving ? styles.leaving : ''}`;
+
+  if (group.orphan) {
+    return <View className={wrapClass}>{card}</View>;
+  }
+
+  return (
+    <View className={wrapClass}>
+      <SwipeCell
+        rightWidth={SWIPE_DELETE_WIDTH}
+        name={group.aliasName}
+        disabled={!!leaving}
+        slot={{
+          right: (
+            <View
+              className={styles.swipeDelete}
+              hoverClassName={styles.swipeDeleteHover}
+              hoverStartTime={20}
+              hoverStayTime={70}
+              onClick={onDelete}
+            >
+              <Text className={styles.swipeDeleteText}>{Strings.getLang('delete')}</Text>
+            </View>
+          ),
+        }}
+      >
+        {card}
+      </SwipeCell>
     </View>
   );
 }
