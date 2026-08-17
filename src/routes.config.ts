@@ -21,4 +21,9 @@ export const routes: Routes = [
     path: '/pages/energy-report/index',
     name: 'EnergyReport',
   },
+  {
+    route: '/logs',
+    path: '/pages/logs/index',
+    name: 'DeviceLogs',
+  },
 ];
