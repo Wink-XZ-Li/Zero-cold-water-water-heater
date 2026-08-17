@@ -35,6 +35,7 @@ export type AddTimerPayload = {
   dps: TimerDps;
   aliasName: string;
   isAppPush?: boolean;
+  date?: string;
 };
 
 export function addDeviceTimer(
@@ -52,7 +53,8 @@ export function addDeviceTimer(
         dps: timer.dps,
         aliasName: timer.aliasName,
         isAppPush: timer.isAppPush ?? false,
-      },
+        ...(timer.date ? { date: timer.date } : {}),
+      } as Parameters<typeof addTimer>[0]['timer'],
       success: res => resolve(res.timerId),
       fail: err => reject(new Error(err?.errorMsg || String(err?.errorCode ?? 'add_failed'))),
     });
@@ -66,6 +68,7 @@ export type UpdateTimerPayload = {
   dps: TimerDps;
   aliasName: string;
   isAppPush?: boolean;
+  date?: string;
 };
 
 export function updateDeviceTimer(deviceId: string, timer: UpdateTimerPayload): Promise<void> {
@@ -79,7 +82,8 @@ export function updateDeviceTimer(deviceId: string, timer: UpdateTimerPayload): 
         dps: timer.dps,
         aliasName: timer.aliasName,
         isAppPush: timer.isAppPush ?? false,
-      },
+        ...(timer.date ? { date: timer.date } : {}),
+      } as Parameters<typeof updateTimer>[0]['timer'],
       success: () => resolve(),
       fail: err => reject(new Error(err?.errorMsg || String(err?.errorCode ?? 'update_failed'))),
     });

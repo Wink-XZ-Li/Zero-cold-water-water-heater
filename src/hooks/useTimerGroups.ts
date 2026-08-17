@@ -11,7 +11,9 @@ import {
 import {
   TIMER_CATEGORY,
   buildZcDps,
+  computeOnceWindow,
   createAliasName,
+  isOnceLoops,
   isValidLoops,
   isValidTimeRange,
   normalizeTime,
@@ -73,6 +75,32 @@ export function useTimerGroups() {
       if (!deviceId || group.orphan || !group.startTimerId || !group.endTimerId) {
         throw new Error('invalid_group');
       }
+      if (enabled && isOnceLoops(group.loops)) {
+        const { startDate, endDate } = computeOnceWindow(group.startTime, group.endTime);
+        await updateDeviceTimer(deviceId, {
+          timerId: group.startTimerId,
+          time: group.startTime,
+          loops: group.loops,
+          dps: buildZcDps(true),
+          aliasName: group.aliasName,
+          isAppPush: group.isAppPush,
+          date: startDate,
+        });
+        try {
+          await updateDeviceTimer(deviceId, {
+            timerId: group.endTimerId,
+            time: group.endTime,
+            loops: group.loops,
+            dps: buildZcDps(false),
+            aliasName: group.aliasName,
+            isAppPush: group.isAppPush,
+            date: endDate,
+          });
+        } catch (e) {
+          await refresh({ silent: true });
+          throw e;
+        }
+      }
       await updateDeviceTimerStatus(deviceId, group.startTimerId, enabled);
       try {
         await updateDeviceTimerStatus(deviceId, group.endTimerId, enabled);
@@ -99,12 +127,15 @@ export function useTimerGroups() {
       if (!isValidTimeRange(startTime, endTime)) throw new Error('invalid_time_range');
 
       const aliasName = createAliasName();
+      const once = isOnceLoops(form.loops);
+      const window = once ? computeOnceWindow(startTime, endTime) : null;
       const startId = await addDeviceTimer(deviceId, {
         time: startTime,
         loops: form.loops,
         dps: buildZcDps(true),
         aliasName,
         isAppPush: form.isAppPush,
+        ...(window ? { date: window.startDate } : {}),
       });
       try {
         await addDeviceTimer(deviceId, {
@@ -113,6 +144,7 @@ export function useTimerGroups() {
           dps: buildZcDps(false),
           aliasName,
           isAppPush: form.isAppPush,
+          ...(window ? { date: window.endDate } : {}),
         });
       } catch (e) {
         try {
@@ -137,6 +169,8 @@ export function useTimerGroups() {
       if (!isValidLoops(form.loops)) throw new Error('invalid_loops');
       if (!isValidTimeRange(startTime, endTime)) throw new Error('invalid_time_range');
 
+      const once = isOnceLoops(form.loops);
+      const window = once ? computeOnceWindow(startTime, endTime) : null;
       await updateDeviceTimer(deviceId, {
         timerId: group.startTimerId,
         time: startTime,
@@ -144,6 +178,7 @@ export function useTimerGroups() {
         dps: buildZcDps(true),
         aliasName: group.aliasName,
         isAppPush: form.isAppPush,
+        ...(window ? { date: window.startDate } : {}),
       });
       try {
         await updateDeviceTimer(deviceId, {
@@ -153,6 +188,7 @@ export function useTimerGroups() {
           dps: buildZcDps(false),
           aliasName: group.aliasName,
           isAppPush: form.isAppPush,
+          ...(window ? { date: window.endDate } : {}),
         });
       } catch (e) {
         await refresh({ silent: true });

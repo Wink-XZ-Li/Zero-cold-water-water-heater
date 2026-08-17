@@ -1,7 +1,15 @@
+import dayjs, { Dayjs } from 'dayjs';
 import type { CloudTimer } from '@/api/timer';
 
 export const TIMER_CATEGORY = 'zc_schedule';
 export const ZC_ALWAYS_ON_DP_ID = '104';
+export const ONCE_LOOPS = '0000000';
+export const DAILY_LOOPS = '1111111';
+export const WEEKDAY_LOOPS = '0111110';
+export const WEEKDAY_SELECTED = [false, true, true, true, true, true, false];
+export const ALL_DAYS_SELECTED = [true, true, true, true, true, true, true];
+
+export type RepeatMode = 'once' | 'daily' | 'custom';
 
 export type TimerGroup = {
   aliasName: string;
@@ -9,6 +17,8 @@ export type TimerGroup = {
   endTimerId: string;
   startTime: string;
   endTime: string;
+  /** Start timer calendar day, compact YYYYMMDD. Empty when cloud omitted it. */
+  date: string;
   loops: string;
   isAppPush: boolean;
   enabled: boolean;
@@ -32,8 +42,29 @@ export function buildZcDps(on: boolean): Record<string, boolean> {
   return { [ZC_ALWAYS_ON_DP_ID]: on };
 }
 
+export function isLoopsBits(loops: string): boolean {
+  return /^[01]{7}$/.test(loops);
+}
+
+/** Once (`0000000`) or any weekly mask. */
 export function isValidLoops(loops: string): boolean {
-  return /^[01]{7}$/.test(loops) && loops.includes('1');
+  return isLoopsBits(loops);
+}
+
+export function isOnceLoops(loops: string): boolean {
+  return loops === ONCE_LOOPS;
+}
+
+export function repeatModeFromLoops(loops: string): RepeatMode {
+  if (loops === ONCE_LOOPS) return 'once';
+  if (loops === DAILY_LOOPS) return 'daily';
+  return 'custom';
+}
+
+export function loopsFromRepeatMode(mode: RepeatMode, selected: boolean[]): string {
+  if (mode === 'once') return ONCE_LOOPS;
+  if (mode === 'daily') return DAILY_LOOPS;
+  return loopsFromSelected(selected);
 }
 
 export function isValidTimeRange(startTime: string, endTime: string): boolean {
@@ -59,17 +90,71 @@ export function loopsFromSelected(selected: boolean[]): string {
 }
 
 export function selectedFromLoops(loops: string): boolean[] {
-  const safe = isValidLoops(loops) ? loops : '0000000';
+  const safe = isLoopsBits(loops) ? loops : ONCE_LOOPS;
   return DAY_KEYS.map((_, i) => safe[i] === '1');
+}
+
+export function parseTimerDate(raw?: string): Dayjs | null {
+  if (!raw) return null;
+  const compact = raw.replace(/-/g, '');
+  if (!/^\d{8}$/.test(compact)) return null;
+  const parsed = dayjs(
+    `${compact.slice(0, 4)}-${compact.slice(4, 6)}-${compact.slice(6, 8)}`
+  );
+  return parsed.isValid() ? parsed : null;
+}
+
+/** zh: 8月18日 (year if not this year). en: Aug 18. */
+export function formatOnceDateLabel(raw: string | undefined, locale: 'zh' | 'en'): string {
+  const parsed = parseTimerDate(raw);
+  if (!parsed) return '';
+  const showYear = parsed.year() !== dayjs().year();
+  if (locale === 'en') {
+    return showYear ? parsed.format('MMM D, YYYY') : parsed.format('MMM D');
+  }
+  const md = `${parsed.month() + 1}月${parsed.date()}日`;
+  return showYear ? `${parsed.year()}年${md}` : md;
+}
+
+/**
+ * Next complete start/end window from `now`.
+ * If start has already been reached (including inside the window), shift to tomorrow.
+ */
+export function computeOnceWindow(
+  startTime: string,
+  endTime: string,
+  now: Dayjs = dayjs()
+): { startDate: string; endDate: string } {
+  const startHm = normalizeTime(startTime);
+  const endHm = normalizeTime(endTime);
+  const [sh, sm] = startHm.split(':').map(Number);
+  const [eh, em] = endHm.split(':').map(Number);
+  let start = now.hour(sh).minute(sm).second(0).millisecond(0);
+  let end = now.hour(eh).minute(em).second(0).millisecond(0);
+  if (endHm < startHm) {
+    end = end.add(1, 'day');
+  }
+  if (!now.isBefore(start)) {
+    start = start.add(1, 'day');
+    end = end.add(1, 'day');
+  }
+  return {
+    startDate: start.format('YYYYMMDD'),
+    endDate: end.format('YYYYMMDD'),
+  };
 }
 
 export function loopsSummary(
   loops: string,
-  labels: { everyDay: string; weekdays: string; days: string[] }
+  labels: { once: string; everyDay: string; weekdays: string; days: string[] },
+  onceDateLabel?: string
 ): string {
-  if (!isValidLoops(loops)) return '';
-  if (loops === '1111111') return labels.everyDay;
-  if (loops === '0111110') return labels.weekdays;
+  if (!isLoopsBits(loops)) return '';
+  if (loops === ONCE_LOOPS) {
+    return onceDateLabel ? `${labels.once} · ${onceDateLabel}` : labels.once;
+  }
+  if (loops === DAILY_LOOPS) return labels.everyDay;
+  if (loops === WEEKDAY_LOOPS) return labels.weekdays;
   const picked = DAY_KEYS.map((_, i) => (loops[i] === '1' ? labels.days[i] : null)).filter(
     Boolean
   ) as string[];
@@ -103,7 +188,8 @@ export function toTimerGroups(timers: CloudTimer[]): TimerGroup[] {
         endTimerId: end.timerId,
         startTime: normalizeTime(start.time),
         endTime: normalizeTime(end.time),
-        loops: start.loops || end.loops || '0000000',
+        date: start.date || '',
+        loops: start.loops || end.loops || ONCE_LOOPS,
         isAppPush: !!(start.isAppPush || end.isAppPush),
         enabled: !!(start.status && end.status),
         orphan: false,
@@ -118,7 +204,8 @@ export function toTimerGroups(timers: CloudTimer[]): TimerGroup[] {
       endTimerId: ends[0]?.timerId || '',
       startTime: normalizeTime(starts[0]?.time || primary?.time || '00:00'),
       endTime: normalizeTime(ends[0]?.time || primary?.time || '00:00'),
-      loops: primary?.loops || '0000000',
+      date: primary?.date || '',
+      loops: primary?.loops || ONCE_LOOPS,
       isAppPush: !!primary?.isAppPush,
       enabled: false,
       orphan: true,
