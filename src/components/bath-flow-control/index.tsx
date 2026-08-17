@@ -89,8 +89,7 @@ export function BathFlowControl({ disabled }: Props) {
           thumbHeight="40rpx"
           thumbRadius="20rpx"
           thumbColor="#2F4573"
-          thumbBorderStyle="solid"
-          thumbBoxShadowStyle="0 0 0 4rpx #FFFFFF"
+          thumbBoxShadowStyle="0 0 0 6rpx #FFFFFF"
           isShowTicks={false}
         />
       </View>

@@ -247,12 +247,11 @@ export function TempControl({ disabled }: Props) {
             minTrackWidth="48rpx"
             minTrackRadius="24rpx"
             minTrackColor="#AEBFE7"
-            thumbWidth="48rpx"
-            thumbHeight="48rpx"
-            thumbRadius="24rpx"
+            thumbWidth="56rpx"
+            thumbHeight="56rpx"
+            thumbRadius="28rpx"
             thumbColor="#2F4573"
-            thumbBorderStyle="solid"
-            thumbBoxShadowStyle="0 0 0 4rpx #FFFFFF"
+            thumbBoxShadowStyle="0 0 0 6rpx #FFFFFF"
             isShowTicks={false}
           />
           <View
