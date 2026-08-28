@@ -1,9 +1,23 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { getAnalyticsLogsStatusLog, ScrollView, View, Text, navigateBack } from '@ray-js/ray';
+import {
+  getAnalyticsLogsPublishLog,
+  getAnalyticsLogsStatusLog,
+  ScrollView,
+  View,
+  Text,
+  navigateBack,
+} from '@ray-js/ray';
 import { NavBar } from '@ray-js/smart-ui';
 import { useDevice } from '@ray-js/panel-sdk';
 import dayjs from 'dayjs';
 import { parseFaultBitmap } from '@/utils/dp';
+import {
+  formatDpLabels,
+  mergeLogItems,
+  parseDpIds,
+  splitLogDpIdQueries,
+  toMillis,
+} from '@/utils/deviceLogs';
 import styles from './index.module.less';
 
 const PAGE_SIZE = 50;
@@ -35,6 +49,7 @@ const DP_META: DpMeta[] = [
   { id: 25, label: '25-耗水量', type: 'value', unit: 'L' },
   { id: 101, label: '101-单次零冷水', type: 'bool' },
   { id: 102, label: '102-零冷水水控预热开关', type: 'bool' },
+  { id: 109, label: '109-点动单次零冷水', type: 'bool' },
 ];
 
 const DP_META_MAP: Record<number, DpMeta> = DP_META.reduce((acc, item) => {
@@ -43,7 +58,7 @@ const DP_META_MAP: Record<number, DpMeta> = DP_META.reduce((acc, item) => {
 }, {} as Record<number, DpMeta>);
 
 const ALL_DP_IDS = DP_META.map(d => String(d.id)).join(',');
-const ZERO_COLD_DP_IDS = '101,102,15';
+const ZERO_COLD_DP_IDS = '101,102,109,15';
 
 type TabDef = {
   key: string;
@@ -75,20 +90,15 @@ function formatFault(value: string): string {
   return codes.length > 0 ? codes.join('、') : '未知故障';
 }
 
-function normalizeDpId(dpId: number | string): number | null {
-  if (typeof dpId === 'number' && !Number.isNaN(dpId)) return dpId;
-  const first = String(dpId).split(',')[0].trim();
-  const num = Number(first);
-  return Number.isNaN(num) ? null : num;
-}
-
 function formatBool(value: string): string {
   const s = String(value).toLowerCase();
   return s === 'true' || s === '1' ? '开' : '关';
 }
 
-function formatValue(value: unknown, meta?: DpMeta): string {
+function formatValue(value: unknown, dpId: number | string, metaMap: Record<number, DpMeta>): string {
   const raw = value == null ? '' : String(value);
+  const ids = parseDpIds(dpId);
+  const meta = ids.map(id => metaMap[id]).find(Boolean);
   if (!meta) return raw;
   switch (meta.type) {
     case 'bool':
@@ -104,8 +114,24 @@ function formatValue(value: unknown, meta?: DpMeta): string {
   }
 }
 
-function toMillis(timeStamp: number): number {
-  return timeStamp > 1e12 ? timeStamp : timeStamp * 1000;
+async function fetchLogChunk(
+  fetcher: typeof getAnalyticsLogsStatusLog,
+  params: { devId: string; dpIds: string; offset: number }
+) {
+  try {
+    const res = await fetcher({
+      ...params,
+      limit: PAGE_SIZE,
+      sortType: 'DESC',
+    });
+    return {
+      dps: (res?.dps || []) as LogItem[],
+      hasNext: !!res?.hasNext,
+    };
+  } catch (e) {
+    console.error('[Logs] fetchLogChunk error:', e);
+    return { dps: [] as LogItem[], hasNext: false };
+  }
 }
 
 export function Logs() {
@@ -127,18 +153,26 @@ export function Logs() {
       fetchGen.current = gen;
       setLoading(true);
       try {
-        const res = await getAnalyticsLogsStatusLog({
-          devId: devInfo.devId,
-          dpIds: tab.dpIds,
-          offset: reqOffset,
-          limit: PAGE_SIZE,
-          sortType: 'DESC',
-        });
+        const queries = splitLogDpIdQueries(tab.dpIds);
+        const chunks = await Promise.all(
+          queries.flatMap(dpIds => [
+            fetchLogChunk(getAnalyticsLogsStatusLog, {
+              devId: devInfo.devId,
+              dpIds,
+              offset: reqOffset,
+            }),
+            fetchLogChunk(getAnalyticsLogsPublishLog, {
+              devId: devInfo.devId,
+              dpIds,
+              offset: reqOffset,
+            }),
+          ])
+        );
         if (gen !== fetchGen.current) return;
         setOffset(reqOffset);
-        hasNext.current = !!res.hasNext;
-        const next = (res.dps || []) as LogItem[];
-        setList(d => (append ? [...d, ...next] : next));
+        hasNext.current = chunks.some(chunk => chunk.hasNext);
+        const next = mergeLogItems(chunks.map(chunk => chunk.dps));
+        setList(d => (append ? mergeLogItems([d, next]) : next));
       } catch (e) {
         console.error('[Logs] fetchData error:', e);
         if (gen !== fetchGen.current) return;
@@ -211,9 +245,7 @@ export function Logs() {
             preDay = curDay;
           }
 
-          const dpId = normalizeDpId(item.dpId);
-          const meta = dpId == null ? undefined : DP_META_MAP[dpId];
-          const actionText = formatValue(item.value, meta);
+          const actionText = formatValue(item.value, item.dpId, DP_META_MAP);
           const showName = currentTab.mixed;
 
           return (
@@ -222,7 +254,7 @@ export function Logs() {
               <View className={styles.item}>
                 <Text className={styles.time}>{date.format('HH:mm')}</Text>
                 {showName ? (
-                  <Text className={styles.dpName}>{meta?.label || `DP ${item.dpId}`}</Text>
+                  <Text className={styles.dpName}>{formatDpLabels(item.dpId, DP_META_MAP)}</Text>
                 ) : null}
                 <Text className={styles.action}>{actionText}</Text>
               </View>

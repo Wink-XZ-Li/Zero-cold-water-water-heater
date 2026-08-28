@@ -19,23 +19,23 @@ type Props = {
 
 /**
  * Zero-cold home block — Ardot 55:817 (toggle) + 55:824 (preheat entry).
- * Toggle is the OR of once_zero_cold (DP 101, one-shot) and zc_always_on (DP 104, schedule).
- * Off  101=F 104=F → tap opens one-shot (101=T)
- * On   101=F 104=T → tap closes schedule (104=F)
- * On   101=T 104=F → tap closes one-shot (101=F)
- * On   101=T 104=T → tap closes both
+ * Toggle is the OR of one-shot (DP 101 panel / DP 109 water-ctrl) and zc_always_on (DP 104).
+ * Off  101=F 109=F 104=F → tap opens panel one-shot (101=T only; never write 109=T)
+ * On   any of 101/109/104 → tap closes 101, 109, and 104
+ * 104 (schedule) outranks one-shot for the subtitle; 101 and 109 share「单次运行中」.
  * Preheat row opens schedule list (002).
  */
 export function ZeroColdEntry({ writeDisabled }: Props) {
   const once = useProps(p => !!p.once_zero_cold);
+  const waterCtrlOnce = useProps(p => !!p.water_ctrl_once_zc);
   const alwaysOn = useProps(p => !!p.zc_always_on);
   const actions = useActions();
-  const isOn = once || alwaysOn;
-  // 104 (schedule) outranks 101 for the subtitle.
+  const onceShot = once || waterCtrlOnce;
+  const isOn = onceShot || alwaysOn;
   let hintKey: 'zero_cold_hint_off' | 'zero_cold_hint_once' | 'zero_cold_hint_schedule' =
     'zero_cold_hint_off';
   if (alwaysOn) hintKey = 'zero_cold_hint_schedule';
-  else if (once) hintKey = 'zero_cold_hint_once';
+  else if (onceShot) hintKey = 'zero_cold_hint_once';
 
   const onToggle = (event: { detail?: boolean } | boolean) => {
     if (writeDisabled) return;
@@ -44,7 +44,8 @@ export function ZeroColdEntry({ writeDisabled }: Props) {
       if (!once) actions.once_zero_cold.set(true);
       return;
     }
-    if (once) actions.once_zero_cold.set(false);
+    actions.once_zero_cold.set(false);
+    actions.water_ctrl_once_zc.set(false);
     if (alwaysOn) actions.zc_always_on.set(false);
   };
 
