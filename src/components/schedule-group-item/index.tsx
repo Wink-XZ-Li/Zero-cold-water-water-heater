@@ -30,6 +30,9 @@ function readChecked(event: unknown): boolean {
 }
 
 function timeTitle(group: TimerGroup): string {
+  if (!group.startTimerId || !group.startTime) {
+    return group.endTime;
+  }
   const end = isOvernightPeriod(group.startTime, group.endTime)
     ? `${Strings.getLang('schedule_next_day')} ${group.endTime}`
     : group.endTime;
@@ -81,7 +84,7 @@ export function ScheduleGroupItem({
       hoverStayTime={120}
     >
       <View className={styles.main}>
-        <View className={styles.textCol} onClick={group.orphan || leaving ? undefined : onPress}>
+        <View className={styles.textCol} onClick={group.orphan || leaving || !group.startTimerId ? undefined : onPress}>
           <Text className={styles.time}>{timeTitle(group)}</Text>
           {group.orphan ? (
             <Text className={styles.sub}>{Strings.getLang('schedule_orphan')}</Text>
@@ -96,7 +99,7 @@ export function ScheduleGroupItem({
           <View className={styles.switchWrap}>
             <Switch
               checked={group.enabled}
-              disabled={!!toggling || !!leaving}
+              disabled={!!toggling || !!leaving || (group.missingStart && !group.enabled)}
               activeColor="var(--index-accent)"
               onChange={(event: unknown) => {
                 onToggle?.(readChecked(event));

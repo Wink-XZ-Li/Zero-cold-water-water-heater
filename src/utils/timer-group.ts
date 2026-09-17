@@ -19,10 +19,14 @@ export type TimerGroup = {
   endTime: string;
   /** Start timer calendar day, compact YYYYMMDD. Empty when cloud omitted it. */
   date: string;
+  /** End timer calendar day. Empty when cloud omitted it. */
+  endDate: string;
   loops: string;
   isAppPush: boolean;
   enabled: boolean;
   orphan: boolean;
+  /** Once group whose start timer was consumed/removed by the cloud. */
+  missingStart: boolean;
 };
 
 const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
@@ -82,6 +86,75 @@ export function normalizeTime(time: string): string {
 export function isOvernightPeriod(startTime: string, endTime: string): boolean {
   if (!isValidTimeRange(startTime, endTime)) return false;
   return normalizeTime(endTime) < normalizeTime(startTime);
+}
+
+/** Once groups stay on while either timer is still armed; repeating needs both. */
+export function groupEnabledFromStatus(
+  startOn: boolean,
+  endOn: boolean,
+  loops: string
+): boolean {
+  if (isOnceLoops(loops)) return startOn || endOn;
+  return startOn && endOn;
+}
+
+export function loopsAllowsDay(loops: string, dayIndex: number): boolean {
+  if (!isLoopsBits(loops) || dayIndex < 0 || dayIndex > 6) return false;
+  return loops[dayIndex] === '1';
+}
+
+export function atTimeOnDate(dateRaw: string, time: string): Dayjs | null {
+  const parsed = parseTimerDate(dateRaw);
+  if (!parsed || !/^\d{1,2}:\d{2}$/.test(time)) return null;
+  const [h, m] = normalizeTime(time).split(':').map(Number);
+  return parsed.hour(h).minute(m).second(0).millisecond(0);
+}
+
+function clockHm(now: Dayjs): string {
+  return `${String(now.hour()).padStart(2, '0')}:${String(now.minute()).padStart(2, '0')}`;
+}
+
+/** Repeating groups: today/yesterday loops bits + clock, including overnight. */
+export function isInRepeatingWindow(
+  startTime: string,
+  endTime: string,
+  loops: string,
+  now: Dayjs = dayjs()
+): boolean {
+  if (!isValidTimeRange(startTime, endTime) || !isLoopsBits(loops)) return false;
+  const startHm = normalizeTime(startTime);
+  const endHm = normalizeTime(endTime);
+  const hm = clockHm(now);
+  const today = now.day();
+  if (endHm > startHm) {
+    return loopsAllowsDay(loops, today) && hm >= startHm && hm < endHm;
+  }
+  const yesterday = (today + 6) % 7;
+  if (hm >= startHm) return loopsAllowsDay(loops, today);
+  if (hm < endHm) return loopsAllowsDay(loops, yesterday);
+  return false;
+}
+
+/**
+ * Whether `now` falls in this group's active zero-cold window (for closing DP 104).
+ * Once groups use date+time when the cloud provided dates; end-only once is in-window until end.
+ */
+export function isInGroupWindow(group: TimerGroup, now: Dayjs = dayjs()): boolean {
+  if (isOnceLoops(group.loops)) {
+    const endAt = atTimeOnDate(group.endDate || group.date, group.endTime);
+    if (group.missingStart || !group.startTimerId) {
+      if (endAt) return now.isBefore(endAt);
+      return false;
+    }
+    const startAt = atTimeOnDate(group.date, group.startTime);
+    if (startAt && endAt) return !now.isBefore(startAt) && now.isBefore(endAt);
+    return isInRepeatingWindow(group.startTime, group.endTime, DAILY_LOOPS, now);
+  }
+  return isInRepeatingWindow(group.startTime, group.endTime, group.loops, now);
+}
+
+export function groupTimerIds(group: TimerGroup): string[] {
+  return [group.startTimerId, group.endTimerId].filter(Boolean);
 }
 
 export function loopsFromSelected(selected: boolean[]): string {
@@ -182,6 +255,7 @@ export function toTimerGroups(timers: CloudTimer[]): TimerGroup[] {
     if (starts.length === 1 && ends.length === 1) {
       const start = starts[0];
       const end = ends[0];
+      const loops = start.loops || end.loops || ONCE_LOOPS;
       groups.push({
         aliasName,
         startTimerId: start.timerId,
@@ -189,10 +263,31 @@ export function toTimerGroups(timers: CloudTimer[]): TimerGroup[] {
         startTime: normalizeTime(start.time),
         endTime: normalizeTime(end.time),
         date: start.date || '',
-        loops: start.loops || end.loops || ONCE_LOOPS,
+        endDate: end.date || '',
+        loops,
         isAppPush: !!(start.isAppPush || end.isAppPush),
-        enabled: !!(start.status && end.status),
+        enabled: groupEnabledFromStatus(!!start.status, !!end.status, loops),
         orphan: false,
+        missingStart: false,
+      });
+      return;
+    }
+
+    if (starts.length === 0 && ends.length === 1 && isOnceLoops(ends[0].loops || ONCE_LOOPS)) {
+      const end = ends[0];
+      groups.push({
+        aliasName,
+        startTimerId: '',
+        endTimerId: end.timerId,
+        startTime: '',
+        endTime: normalizeTime(end.time),
+        date: end.date || '',
+        endDate: end.date || '',
+        loops: end.loops || ONCE_LOOPS,
+        isAppPush: !!end.isAppPush,
+        enabled: !!end.status,
+        orphan: false,
+        missingStart: true,
       });
       return;
     }
@@ -205,10 +300,12 @@ export function toTimerGroups(timers: CloudTimer[]): TimerGroup[] {
       startTime: normalizeTime(starts[0]?.time || primary?.time || '00:00'),
       endTime: normalizeTime(ends[0]?.time || primary?.time || '00:00'),
       date: primary?.date || '',
+      endDate: ends[0]?.date || '',
       loops: primary?.loops || ONCE_LOOPS,
       isAppPush: !!primary?.isAppPush,
       enabled: false,
       orphan: true,
+      missingStart: starts.length === 0,
     });
   });
 
@@ -300,7 +397,7 @@ export function validateTimerConsistency(timers: CloudTimer[]): TimerConsistency
       });
       return;
     }
-    if (!isValidTimeRange(g.startTime, g.endTime)) {
+    if (!g.missingStart && !isValidTimeRange(g.startTime, g.endTime)) {
       issues.push({
         level: 'error',
         code: 'same_time',
@@ -309,7 +406,7 @@ export function validateTimerConsistency(timers: CloudTimer[]): TimerConsistency
       });
     }
     const pair = timers.filter(t => t.aliasName === g.aliasName);
-    if (pair.length !== 2) {
+    if (pair.length !== 2 && !(g.missingStart && pair.length === 1)) {
       issues.push({
         level: 'error',
         code: 'pair_count',
@@ -335,7 +432,7 @@ export function validateTimerConsistency(timers: CloudTimer[]): TimerConsistency
           aliasName: g.aliasName,
         });
       }
-      if (!!a.status !== !!b.status) {
+      if (!!a.status !== !!b.status && !isOnceLoops(g.loops)) {
         issues.push({
           level: 'warn',
           code: 'status_mismatch',

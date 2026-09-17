@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useDevice } from '@ray-js/panel-sdk';
+import { useActions, useDevice, useProps } from '@ray-js/panel-sdk';
 import {
   addDeviceTimer,
   removeDeviceTimer,
@@ -13,6 +13,8 @@ import {
   buildZcDps,
   computeOnceWindow,
   createAliasName,
+  groupTimerIds,
+  isInGroupWindow,
   isOnceLoops,
   isValidLoops,
   isValidTimeRange,
@@ -35,6 +37,8 @@ export type RefreshOptions = {
 
 export function useTimerGroups() {
   const deviceId = useDevice(d => d.devInfo?.devId || '') as string;
+  const actions = useActions();
+  const zcAlwaysOn = useProps(p => !!p.zc_always_on);
   const [timers, setTimers] = useState<CloudTimer[]>([]);
   const [groups, setGroups] = useState<TimerGroup[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,52 +74,74 @@ export function useTimerGroups() {
     refresh();
   }, [refresh]);
 
+  const closeZcIfInWindow = useCallback(
+    (group: TimerGroup) => {
+      if (zcAlwaysOn && isInGroupWindow(group)) {
+        actions.zc_always_on.set(false);
+      }
+    },
+    [actions, zcAlwaysOn]
+  );
+
   const setGroupEnabled = useCallback(
     async (group: TimerGroup, enabled: boolean) => {
-      if (!deviceId || group.orphan || !group.startTimerId || !group.endTimerId) {
+      if (!deviceId || group.orphan) {
         throw new Error('invalid_group');
       }
-      if (enabled && isOnceLoops(group.loops)) {
-        const { startDate, endDate } = computeOnceWindow(group.startTime, group.endTime);
-        await updateDeviceTimer(deviceId, {
-          timerId: group.startTimerId,
-          time: group.startTime,
-          loops: group.loops,
-          dps: buildZcDps(true),
-          aliasName: group.aliasName,
-          isAppPush: group.isAppPush,
-          date: startDate,
-        });
-        try {
+      const ids = groupTimerIds(group);
+      if (ids.length === 0) throw new Error('invalid_group');
+
+      if (enabled) {
+        if (!group.startTimerId || !group.endTimerId) {
+          throw new Error('invalid_group');
+        }
+        if (isOnceLoops(group.loops)) {
+          const { startDate, endDate } = computeOnceWindow(group.startTime, group.endTime);
           await updateDeviceTimer(deviceId, {
-            timerId: group.endTimerId,
-            time: group.endTime,
+            timerId: group.startTimerId,
+            time: group.startTime,
             loops: group.loops,
-            dps: buildZcDps(false),
+            dps: buildZcDps(true),
             aliasName: group.aliasName,
             isAppPush: group.isAppPush,
-            date: endDate,
+            date: startDate,
           });
+          try {
+            await updateDeviceTimer(deviceId, {
+              timerId: group.endTimerId,
+              time: group.endTime,
+              loops: group.loops,
+              dps: buildZcDps(false),
+              aliasName: group.aliasName,
+              isAppPush: group.isAppPush,
+              date: endDate,
+            });
+          } catch (e) {
+            await refresh({ silent: true });
+            throw e;
+          }
+        }
+      } else {
+        closeZcIfInWindow(group);
+      }
+
+      await updateDeviceTimerStatus(deviceId, ids[0], enabled);
+      if (ids[1]) {
+        try {
+          await updateDeviceTimerStatus(deviceId, ids[1], enabled);
         } catch (e) {
+          try {
+            await updateDeviceTimerStatus(deviceId, ids[0], group.enabled);
+          } catch {
+            // refresh will reconcile
+          }
           await refresh({ silent: true });
           throw e;
         }
       }
-      await updateDeviceTimerStatus(deviceId, group.startTimerId, enabled);
-      try {
-        await updateDeviceTimerStatus(deviceId, group.endTimerId, enabled);
-      } catch (e) {
-        try {
-          await updateDeviceTimerStatus(deviceId, group.startTimerId, group.enabled);
-        } catch {
-          // refresh will reconcile
-        }
-        await refresh({ silent: true });
-        throw e;
-      }
       await refresh({ silent: true });
     },
-    [deviceId, refresh]
+    [closeZcIfInWindow, deviceId, refresh]
   );
 
   const createGroup = useCallback(
@@ -202,6 +228,7 @@ export function useTimerGroups() {
   const removeGroup = useCallback(
     async (group: TimerGroup) => {
       if (!deviceId) throw new Error('missing_device');
+      closeZcIfInWindow(group);
       const ids = [group.startTimerId, group.endTimerId].filter(Boolean);
       const related = timers.filter(t => t.aliasName === group.aliasName).map(t => t.timerId);
       const unique = Array.from(new Set([...ids, ...related]));
@@ -211,7 +238,7 @@ export function useTimerGroups() {
         throw new Error('remove_partial');
       }
     },
-    [deviceId, refresh, timers]
+    [closeZcIfInWindow, deviceId, refresh, timers]
   );
 
   return {
