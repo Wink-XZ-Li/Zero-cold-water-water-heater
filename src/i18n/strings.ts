@@ -18,7 +18,7 @@ export default {
     temp_out_of_range: 'Temperature must be between {min}–{max}°C',
     temp_high_unlock_title: 'High temperature',
     temp_high_unlock_message:
-      'While heating, setting 50°C or above requires confirmation. After unlock, temperature adjusts in 5°C steps up to 65°C.',
+      'In standby or heating, setting 50°C or above requires confirmation. After unlock, temperature adjusts in 5°C steps up to 65°C.',
     device_offline: 'Device offline. Changes were not applied.',
     action_failed: 'Command failed. Please try again.',
     fault_title: 'Fault',
@@ -159,7 +159,7 @@ export default {
     temp_out_of_range: '设定温度需在 {min}–{max}℃ 范围内',
     temp_high_unlock_title: '高温设定确认',
     temp_high_unlock_message:
-      '加热状态下将温度调至 50℃ 及以上需二次确认。解锁后按 5℃ 步进调节，最高 65℃。',
+      '待机或加热状态下将温度调至 50℃ 及以上需二次确认。解锁后按 5℃ 步进调节，最高 65℃。',
     device_offline: '设备离线，操作未生效',
     action_failed: '指令下发失败，请重试',
     fault_title: '故障告警',

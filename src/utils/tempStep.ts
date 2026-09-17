@@ -1,4 +1,7 @@
-/** 加热态：「+」从 49 调至 50℃ 需解锁；已在 50 未解锁再上调同样需解锁；滑条松手 ≥50℃ 也需解锁一次 */
+/**
+ * 待机或加热：「+」从 49 调至 50℃ 需解锁；已在 50 未解锁再上调同样需解锁后到 55。
+ * 滑条松手 ≥50℃ 也需解锁一次。关机（off）不拦截。
+ */
 
 export const TEMP_HIGH_GATE = 50;
 export const TEMP_FINE_STEP = 1;
@@ -6,6 +9,11 @@ export const TEMP_COARSE_STEP = 5;
 
 export function isHeatingWorkState(workState: string | undefined | null): boolean {
   return workState === 'bath_heating' || workState === 'zc_heating';
+}
+
+/** 待机、卫浴加热、零冷水加热均拦截 ≥50℃ */
+export function shouldEnforceHighTempGate(workState: string | undefined | null): boolean {
+  return workState === 'standby' || isHeatingWorkState(workState);
 }
 
 /** 「+」键是否处于粗步进区（>50，或已在 50 且已解锁/非加热） */
@@ -44,7 +52,7 @@ export function tempSliderStep(value: number): number {
   return value >= TEMP_HIGH_GATE ? TEMP_COARSE_STEP : TEMP_FINE_STEP;
 }
 
-/** 加热未解锁时，滑条松手目标 ≥50℃ 需弹窗 */
+/** 未解锁时，滑条松手目标 ≥50℃ 需弹窗（待机与加热） */
 export function sliderNeedsHighUnlock(
   value: number,
   opts: { unlocked: boolean; heating: boolean }
@@ -54,7 +62,7 @@ export function sliderNeedsHighUnlock(
 
 /**
  * 量化温度刻度。
- * `enforceUnlockGate`：加热未解锁时把 ≥50 钳到 49（取消确认时回退）。
+ * `enforceUnlockGate`：未解锁时把 ≥50 钳到 49（取消确认时回退）。
  */
 export function quantizeTemp(
   value: number,

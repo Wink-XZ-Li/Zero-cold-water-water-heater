@@ -9,7 +9,7 @@ import { ICON_LIGHT, MinusGlyph, PlusGlyph, ShowerGlyph } from '@/components/pan
 import {
   TEMP_FINE_STEP,
   TEMP_HIGH_GATE,
-  isHeatingWorkState,
+  shouldEnforceHighTempGate,
   quantizeTemp,
   sliderNeedsHighUnlock,
   tempMinusDelta,
@@ -35,7 +35,7 @@ const WRITE_DEBOUNCE_MS = 150;
 
 /**
  * Bathroom temp card — Ardot 55:832
- * 「+」加热态从 49 调至 50℃ 需弹窗并落到 50；已在 50 未解锁再上调同样需解锁后到 55。
+ * 「+」待机/加热从 49 调至 50℃ 需弹窗并落到 50；已在 50 未解锁再上调同样需解锁后到 55。
  * 滑条松手目标 ≥50℃ 仍弹窗，确认后落到松手刻度；解锁后可至上限。
  *
  * 交互约定：加减按点击次数累加意图（UI 立刻跟上，DP 150ms 防抖合并）；
@@ -47,7 +47,7 @@ export function TempControl({ disabled }: Props) {
   const actions = useActions();
   const { min, max, toDisplay, prepareWrite } = useTempSetGuard();
 
-  const heating = isHeatingWorkState(workState);
+  const heating = shouldEnforceHighTempGate(workState);
   const setDisplay = toDisplay(tempSetRaw);
   const safeValue = Number.isFinite(setDisplay) ? setDisplay : min;
 
